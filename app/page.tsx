@@ -8,6 +8,7 @@ const projects = [
       "A production-ready Retrieval-Augmented Generation chatbot that lets businesses query their internal PDF documents in natural language. Returns answers with page-level source citations and supports real-time document upload.",
     stack: ["Python", "LangChain", "LangGraph", "Groq (Llama-3.3-70B)", "pgvector", "Streamlit", "Docker"],
     github: "https://github.com/pcbeingused333/rag-chatbot-portfolio",
+    demo: "https://rag-chatbot-demo-0.streamlit.app",
     role: "Architecture, retrieval pipeline, agent design",
   },
   {
@@ -133,6 +134,9 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex md:flex-col gap-3 text-sm md:items-end">
+                  {p.demo && (
+                    <a href={p.demo} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider px-3 py-1.5 bg-orange-800 text-stone-50 rounded-full hover:bg-orange-900 transition-colors whitespace-nowrap">● live demo</a>
+                  )}
                   {p.github && (
                     <a href={p.github} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">github</a>
                   )}
