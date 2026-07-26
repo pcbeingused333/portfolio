@@ -1,5 +1,16 @@
 import Link from "next/link";
-const projects = [
+type Project = {
+  name: string;
+  tagline: string;
+  description: string;
+  stack: string[];
+  github?: string;
+  demo?: string;
+  link?: string;
+  role: string;
+};
+
+const projects: Project[] = [
   {
     name: "RAG Chatbot",
     tagline: "An AI assistant that actually knows your documents.",
@@ -37,8 +48,7 @@ const projects = [
     stack: ["HTML", "CSS", "AI-assisted build"],
     role: "Design, build, content",
   },
-];
-const services = [
+];const services = [
   {
     title: "AI Assistants",
     body: "Custom chatbots and agents that work with your own documents, data and tools. Built on modern RAG architectures with proper retrieval, evaluation and guardrails.",
