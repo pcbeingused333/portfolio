@@ -1,5 +1,4 @@
 import Link from "next/link";
-
 const projects = [
   {
     name: "RAG Chatbot",
@@ -15,7 +14,7 @@ const projects = [
     name: "AI Website Chatbot Widget",
     tagline: "An embeddable assistant that answers for your business 24/7.",
     description:
-      "A drop-in chat widget for small-business websites. It answers customer questions about the business \u2014 menu, hours, location, FAQs \u2014 grounded only in the business's own information, so it never makes things up. Reusable for any client by editing a single config file.",
+      "A drop-in chat widget for small-business websites. It answers customer questions about the business — menu, hours, location, FAQs — grounded only in the business's own information, so it never makes things up. Reusable for any client by editing a single config file.",
     stack: ["Next.js", "React", "TypeScript", "Tailwind", "Groq (Llama-3.3-70B)", "Vercel"],
     github: "https://github.com/pcbeingused333/ai-chat-widget",
     demo: "https://ai-chat-widget-five-ashen.vercel.app",
@@ -32,15 +31,13 @@ const projects = [
   },
   {
     name: "Churreria Calderon",
-    tagline: "A site for the family business.",
+    tagline: "A site for a family business.",
     description:
-      "A clean, fast website for my family-run churreria in Toronto. Built to showcase the menu, story and location, and to test how far AI-assisted tooling can take a static marketing site.",
+      "A clean, fast website I built for a family-run churreria in Toronto — menu, story and location — and a testbed for how far AI-assisted tooling can take a static marketing site.",
     stack: ["HTML", "CSS", "AI-assisted build"],
-    link: "https://www.churreriacalderon.com",
     role: "Design, build, content",
   },
 ];
-
 const services = [
   {
     title: "AI Assistants",
@@ -52,10 +49,9 @@ const services = [
   },
   {
     title: "Restaurant and Hospitality Tech",
-    body: "I run a restaurant myself. I know which problems are worth solving with software and which are not. Reservations, menus, internal automations, customer follow-up.",
+    body: "I've run a restaurant myself, so I know which problems are worth solving with software and which are not. Reservations, menus, internal automations, customer follow-up.",
   },
 ];
-
 export default function Home() {
   return (
     <main className="grain min-h-screen relative">
@@ -67,7 +63,6 @@ export default function Home() {
           <a href="#contact" className="hover:text-stone-900 transition-colors">contact</a>
         </div>
       </nav>
-
       <section className="max-w-5xl mx-auto px-6 md:px-10 pt-24 md:pt-40 pb-24 md:pb-32">
         <p className="font-mono text-xs uppercase tracking-widest text-orange-700 mb-6">
           Toronto, Canada &mdash; Available for projects
@@ -78,7 +73,7 @@ export default function Home() {
           websites for <em className="italic text-orange-800">small businesses</em>.
         </h1>
         <p className="mt-10 md:mt-12 text-lg md:text-xl text-stone-600 max-w-2xl leading-relaxed">
-          I am Alex, a fullstack developer and the owner of a small restaurant in Toronto.
+          I am Alex, a fullstack developer who has also run a small restaurant in Toronto.
           That combination lets me build software that actually understands how a small business runs day-to-day.
         </p>
         <div className="mt-12 flex flex-col sm:flex-row gap-4">
@@ -90,7 +85,6 @@ export default function Home() {
           </a>
         </div>
       </section>
-
       <section id="about" className="border-t border-stone-200">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-24 md:py-32 grid md:grid-cols-[1fr_2fr] gap-12">
           <div>
@@ -102,7 +96,7 @@ export default function Home() {
               I started programming on my own, then went through Le Wagon&apos;s fullstack bootcamp, did a three-month internship at <strong className="font-medium">Oesia</strong> building an internal document-management system, and spent some time teaching Ruby to other students.
             </p>
             <p>
-              These days I run <strong className="font-medium">Churreria Calderon</strong>, a small family restaurant in Toronto, and I build software in the time I have outside the kitchen. Most of my recent work is around <strong className="font-medium">AI agents and RAG systems</strong>, the kind of tools small businesses now have access to but rarely know how to deploy.
+              I also ran <strong className="font-medium">Churreria Calderon</strong>, a small family restaurant in Toronto — which gave me a first-hand feel for how small businesses actually operate. Most of my recent work is around <strong className="font-medium">AI agents and RAG systems</strong>, the kind of tools small businesses now have access to but rarely know how to deploy.
             </p>
             <p>
               I am comfortable across the stack: Python, JavaScript, TypeScript, Ruby on Rails, PostgreSQL, Docker, and the modern AI tooling layer. I care about software that ships and survives contact with real users.
@@ -110,7 +104,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <section id="work" className="border-t border-stone-200">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-24 md:py-32">
           <div className="grid md:grid-cols-[1fr_2fr] gap-12 mb-16">
@@ -119,10 +112,9 @@ export default function Home() {
               <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">Selected work</h2>
             </div>
             <p className="text-stone-600 text-lg leading-relaxed self-end">
-              Three recent projects across AI, recommendation systems and front-end. Repos are public, feel free to look at the code.
+              A few recent projects across AI, recommendation systems and front-end. Repos are public, feel free to look at the code.
             </p>
           </div>
-
           <div className="space-y-px bg-stone-200">
             {projects.map((p, idx) => (
               <article key={p.name} className="bg-stone-50 hover:bg-white transition-colors py-10 md:py-14 px-6 md:px-10 grid md:grid-cols-[80px_1fr_auto] gap-6 md:gap-10 items-start group">
@@ -159,7 +151,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <section className="border-t border-stone-200 bg-stone-100">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-24 md:py-32">
           <div className="grid md:grid-cols-[1fr_2fr] gap-12 mb-16">
@@ -171,7 +162,6 @@ export default function Home() {
               I take on a small number of part-time engagements at a time. Open to one-off projects and ongoing collaborations.
             </p>
           </div>
-
           <div className="grid md:grid-cols-3 gap-6">
             {services.map((s) => (
               <div key={s.title} className="bg-white border border-stone-200 p-8 hover:border-orange-300 transition-colors">
@@ -182,7 +172,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <section id="contact" className="border-t border-stone-200">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-24 md:py-32">
           <div className="grid md:grid-cols-[1fr_2fr] gap-12">
@@ -195,7 +184,6 @@ export default function Home() {
                 Working on something where AI, automation or a small custom web app would help?
                 Send me a short note, I usually reply within a day.
               </p>
-
               <div className="space-y-px bg-stone-200">
                 <ContactRow label="Email" value="alex.castillog33@gmail.com" href="mailto:alex.castillog33@gmail.com" />
                 <ContactRow label="LinkedIn" value="alex-castillo-gonzalez" href="https://www.linkedin.com/in/alex-castillo-gonzalez-65a13110a/" />
@@ -206,7 +194,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <footer className="border-t border-stone-200">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs font-mono text-stone-500">
           <span>2026 Alex Castillo Gonzalez</span>
@@ -216,7 +203,6 @@ export default function Home() {
     </main>
   );
 }
-
 function ContactRow({ label, value, href }: { label: string; value: string; href?: string }) {
   const content = (
     <div className="bg-stone-50 hover:bg-white transition-colors px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 group">
