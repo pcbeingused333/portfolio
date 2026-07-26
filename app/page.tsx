@@ -12,6 +12,16 @@ const projects = [
     role: "Architecture, retrieval pipeline, agent design",
   },
   {
+    name: "AI Website Chatbot Widget",
+    tagline: "An embeddable assistant that answers for your business 24/7.",
+    description:
+      "A drop-in chat widget for small-business websites. It answers customer questions about the business \u2014 menu, hours, location, FAQs \u2014 grounded only in the business's own information, so it never makes things up. Reusable for any client by editing a single config file.",
+    stack: ["Next.js", "React", "TypeScript", "Tailwind", "Groq (Llama-3.3-70B)", "Vercel"],
+    github: "https://github.com/pcbeingused333/ai-chat-widget",
+    demo: "https://ai-chat-widget-five-ashen.vercel.app",
+    role: "Design, full build, deployment",
+  },
+  {
     name: "Semantic Recommender",
     tagline: "Recommendations that learn from feedback.",
     description:
