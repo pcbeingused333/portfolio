@@ -7,6 +7,7 @@ type Project = {
   github?: string;
   demo?: string;
   link?: string;
+  pr?: string;
   role: string;
 };
 
@@ -30,6 +31,15 @@ const projects: Project[] = [
     github: "https://github.com/pcbeingused333/ai-chat-widget",
     demo: "https://ai-chat-widget-five-ashen.vercel.app",
     role: "Design, full build, deployment",
+  },
+  {
+    name: "fenn — open-source contribution",
+    tagline: "Adding Word-document support to an open-source RAG library.",
+    description:
+      "Contributed a .docx (Word) document loader to fenn, an open-source Python RAG library. I followed the library's existing loader pattern to extract text from both paragraphs and tables, added an optional dependency extra, and shipped unit tests. Submitted upstream as a pull request.",
+    stack: ["Python", "python-docx", "pytest", "Git", "Open source"],
+    pr: "https://github.com/pyfenn/fenn/pull/277",
+    role: "Open-source contributor — feature and tests",
   },
   {
     name: "Semantic Recommender",
@@ -122,7 +132,7 @@ export default function Home() {
               <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">Selected work</h2>
             </div>
             <p className="text-stone-600 text-lg leading-relaxed self-end">
-              A few recent projects across AI, recommendation systems and front-end. Repos are public, feel free to look at the code.
+              A few recent projects across AI, open source and the web. Repos are public, feel free to look at the code.
             </p>
           </div>
           <div className="space-y-px bg-stone-200">
@@ -154,6 +164,9 @@ export default function Home() {
                   )}
                   {p.link && (
                     <a href={p.link} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">live site</a>
+                  )}
+                  {p.pr && (
+                    <a href={p.pr} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">pull request</a>
                   )}
                 </div>
               </article>
