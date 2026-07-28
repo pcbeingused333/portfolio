@@ -7,7 +7,8 @@ type Project = {
   github?: string;
   demo?: string;
   link?: string;
-  pr?: string;
+  prs?: { label: string; url: string }[];
+  contributions?: string;
   role: string;
 };
 
@@ -33,13 +34,17 @@ const projects: Project[] = [
     role: "Design, full build, deployment",
   },
   {
-    name: "fenn — open-source contribution",
-    tagline: "Adding Word-document support to an open-source RAG library.",
+    name: "fenn — open-source contributions",
+    tagline: "Ongoing contributions to an open-source Python ML library.",
     description:
-      "Contributed a .docx (Word) document loader to fenn, an open-source Python RAG library. I followed the library's existing loader pattern to extract text from both paragraphs and tables, added an optional dependency extra, and shipped unit tests. Submitted upstream as a pull request.",
-    stack: ["Python", "python-docx", "pytest", "Git", "Open source"],
-    pr: "https://github.com/pyfenn/fenn/pull/277",
-    role: "Open-source contributor — feature and tests",
+      "Two contributions to fenn, an open-source Python framework for ML/deep-learning workflows with a Retrieval-Augmented Generation module. First I added a .docx (Word) document loader — following the library's existing loader pattern to extract text from paragraphs and tables, with an optional-dependency extra and unit tests. Then I fixed the RAG modules' install instructions, which pointed users to a package and extras that don't exist. Both submitted upstream as pull requests.",
+    stack: ["Python", "python-docx", "RAG", "pytest", "Git", "Open source"],
+    prs: [
+      { label: "pr #277", url: "https://github.com/pyfenn/fenn/pull/277" },
+      { label: "pr #286", url: "https://github.com/pyfenn/fenn/pull/286" },
+    ],
+    contributions: "https://github.com/pyfenn/fenn/pulls?q=is%3Apr+author%3Apcbeingused333",
+    role: "Open-source contributor — feature, fix and tests",
   },
   {
     name: "Semantic Recommender",
@@ -165,8 +170,11 @@ export default function Home() {
                   {p.link && (
                     <a href={p.link} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">live site</a>
                   )}
-                  {p.pr && (
-                    <a href={p.pr} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">pull request</a>
+                  {p.prs?.map((pr) => (
+                    <a key={pr.url} href={pr.url} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">{pr.label}</a>
+                  ))}
+                  {p.contributions && (
+                    <a href={p.contributions} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">all contributions</a>
                   )}
                 </div>
               </article>
