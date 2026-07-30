@@ -34,17 +34,16 @@ const projects: Project[] = [
     role: "Design, full build, deployment",
   },
   {
-    name: "fenn — open-source contributions",
-    tagline: "Ongoing contributions to an open-source Python ML library.",
+    name: "rubocop-rspec — open-source contribution",
+    tagline: "A crash fix to a core gem of the RuboCop ecosystem.",
     description:
-      "Two contributions to fenn, an open-source Python framework for ML/deep-learning workflows with a Retrieval-Augmented Generation module. First I added a .docx (Word) document loader — following the library's existing loader pattern to extract text from paragraphs and tables, with an optional-dependency extra and unit tests. Then I fixed the RAG modules' install instructions, which pointed users to a package and extras that don't exist. Both submitted upstream as pull requests.",
-    stack: ["Python", "python-docx", "RAG", "pytest", "Git", "Open source"],
+      "Fixed a crash in rubocop-rspec's `RSpec/LeadingSubject` cop, triggered by Ruby 3.4's implicit `it` block parameter under the Prism parser. The cop walked the AST looking only for `:block` ancestors, so it hit `nil` on the new `itblock`/`numblock` group nodes. I widened the ancestor lookup to `:any_block` and added a regression spec under a Ruby 3.4 context. Submitted upstream as a pull request.",
+    stack: ["Ruby", "RuboCop", "AST", "RSpec", "Git", "Open source"],
     prs: [
-      { label: "pr #277", url: "https://github.com/pyfenn/fenn/pull/277" },
-      { label: "pr #286", url: "https://github.com/pyfenn/fenn/pull/286" },
+      { label: "pr #2209", url: "https://github.com/rubocop/rubocop-rspec/pull/2209" },
     ],
-    contributions: "https://github.com/pyfenn/fenn/pulls?q=is%3Apr+author%3Apcbeingused333",
-    role: "Open-source contributor — feature, fix and tests",
+    contributions: "https://github.com/rubocop/rubocop-rspec/pulls?q=is%3Apr+author%3Apcbeingused333",
+    role: "Open-source contributor — crash fix and regression test",
   },
   {
     name: "Semantic Recommender",
