@@ -34,16 +34,17 @@ const projects: Project[] = [
     role: "Design, full build, deployment",
   },
   {
-    name: "rubocop-rspec — open-source contribution",
-    tagline: "A crash fix to a core gem of the RuboCop ecosystem.",
+    name: "RuboCop — open-source contributions",
+    tagline: "Bug fixes to the RuboCop static-analysis ecosystem.",
     description:
-      "Fixed a crash in rubocop-rspec's `RSpec/LeadingSubject` cop, triggered by Ruby 3.4's implicit `it` block parameter under the Prism parser. The cop walked the AST looking only for `:block` ancestors, so it hit `nil` on the new `itblock`/`numblock` group nodes. I widened the ancestor lookup to `:any_block` and added a regression spec under a Ruby 3.4 context. Submitted upstream as a pull request.",
+      "Two upstream contributions to RuboCop, the standard Ruby linter. In rubocop-rspec I fixed a crash in the `RSpec/LeadingSubject` cop triggered by Ruby 3.4's implicit `it` block parameter under the Prism parser — the cop only walked `:block` AST ancestors and hit `nil` on the new `itblock`/`numblock` nodes, which I resolved by widening the lookup to `:any_block`. In rubocop-performance I fixed `Performance/ConstantRegexp` producing invalid code when autocorrecting a regexp used as a pattern in `case/in` pattern matching. Both submitted with regression specs.",
     stack: ["Ruby", "RuboCop", "AST", "RSpec", "Git", "Open source"],
     prs: [
-      { label: "pr #2209", url: "https://github.com/rubocop/rubocop-rspec/pull/2209" },
+      { label: "rubocop-rspec #2209", url: "https://github.com/rubocop/rubocop-rspec/pull/2209" },
+      { label: "rubocop-performance #529", url: "https://github.com/rubocop/rubocop-performance/pull/529" },
     ],
-    contributions: "https://github.com/rubocop/rubocop-rspec/pulls?q=is%3Apr+author%3Apcbeingused333",
-    role: "Open-source contributor — crash fix and regression test",
+    contributions: "https://github.com/pulls?q=is%3Apr+author%3Apcbeingused333+org%3Arubocop",
+    role: "Open-source contributor — crash/bug fixes and regression tests",
   },
   {
     name: "Semantic Recommender",
