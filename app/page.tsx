@@ -1,82 +1,102 @@
 import Link from "next/link";
+
 type Project = {
   name: string;
   tagline: string;
   description: string;
+  highlight?: string;
   stack: string[];
   github?: string;
   demo?: string;
   link?: string;
-  prs?: { label: string; url: string }[];
-  contributions?: string;
   role: string;
 };
 
 const projects: Project[] = [
   {
     name: "RAG Chatbot",
-    tagline: "An AI assistant that actually knows your documents.",
+    tagline: "Answers grounded in your documents, with the page they came from.",
     description:
-      "A production-ready Retrieval-Augmented Generation chatbot that lets businesses query their internal PDF documents in natural language. Returns answers with page-level source citations and supports real-time document upload.",
-    stack: ["Python", "LangChain", "LangGraph", "Groq (Llama-3.3-70B)", "pgvector", "Streamlit", "Docker"],
+      "A Retrieval-Augmented Generation assistant over PDF documents: a LangGraph agent decides when to search, and every answer carries the source file and page number. Ships in two modes behind one flag — an in-memory FAISS demo that runs on a free 1 GB container with no database, and a pgvector-backed production path.",
+    highlight:
+      "The interesting part is what measurement caught. Production-sized chunks split the demo corpus into fewer pieces than the retrieval k, so every query returned the whole document — it answered correctly while retrieval did nothing. Benchmarking chunk sizes against questions with known answers moved rank-1 accuracy from 3/4 to 4/4. Testing against the live API then caught two more: Spanish queries retrieved nothing from an English index, and the default model returned malformed tool calls on 5 of 10 requests. Fixed by translating the retrieval query rather than paying 600 MB for a multilingual model, and by switching models with a retry path behind it.",
+    stack: ["Python", "LangChain", "LangGraph", "Groq", "FAISS", "pgvector", "Streamlit", "Docker", "pytest"],
     github: "https://github.com/pcbeingused333/rag-chatbot-portfolio",
     demo: "https://rag-chatbot-demo-0.streamlit.app",
-    role: "Architecture, retrieval pipeline, agent design",
+    role: "Architecture, retrieval pipeline, evaluation, deployment",
   },
   {
     name: "AI Website Chatbot Widget",
-    tagline: "An embeddable assistant that answers for your business 24/7.",
+    tagline: "An embeddable assistant that answers for a business 24/7.",
     description:
-      "A drop-in chat widget for small-business websites. It answers customer questions about the business — menu, hours, location, FAQs — grounded only in the business's own information, so it never makes things up. Reusable for any client by editing a single config file.",
-    stack: ["Next.js", "React", "TypeScript", "Tailwind", "Groq (Llama-3.3-70B)", "Vercel"],
+      "A drop-in chat widget for small-business websites. It answers customer questions — menu, hours, location, FAQs — grounded only in the business's own information, so it does not invent details. Reusable for any client by editing a single config file.",
+    stack: ["Next.js", "React", "TypeScript", "Tailwind", "Groq", "Vercel"],
     github: "https://github.com/pcbeingused333/ai-chat-widget",
     demo: "https://ai-chat-widget-five-ashen.vercel.app",
     role: "Design, full build, deployment",
   },
   {
-    name: "RuboCop — open-source contributions",
-    tagline: "Bug fixes to the RuboCop static-analysis ecosystem.",
-    description:
-      "Two upstream contributions to RuboCop, the standard Ruby linter. In rubocop-rspec I fixed a crash in the `RSpec/LeadingSubject` cop triggered by Ruby 3.4's implicit `it` block parameter under the Prism parser — the cop only walked `:block` AST ancestors and hit `nil` on the new `itblock`/`numblock` nodes, which I resolved by widening the lookup to `:any_block`. In rubocop-performance I fixed `Performance/ConstantRegexp` producing invalid code when autocorrecting a regexp used as a pattern in `case/in` pattern matching. Both submitted with regression specs.",
-    stack: ["Ruby", "RuboCop", "AST", "RSpec", "Git", "Open source"],
-    prs: [
-      { label: "rubocop-rspec #2209", url: "https://github.com/rubocop/rubocop-rspec/pull/2209" },
-      { label: "rubocop-performance #529", url: "https://github.com/rubocop/rubocop-performance/pull/529" },
-    ],
-    contributions: "https://github.com/pulls?q=is%3Apr+author%3Apcbeingused333+org%3Arubocop",
-    role: "Open-source contributor — crash/bug fixes and regression tests",
-  },
-  {
     name: "Semantic Recommender",
-    tagline: "Recommendations that learn from feedback.",
+    tagline: "Recommendations from embeddings, not hand-written rules.",
     description:
-      "A recommendation engine built on vector embeddings and a feedback loop that improves results over time. Designed as a reusable backend for content platforms and e-commerce that have outgrown rule-based filters.",
-    stack: ["Python", "Embeddings", "pgvector", "PostgreSQL", "Feedback loop"],
+      "A recommendation engine built on vector embeddings with a feedback loop that refines results over time. Designed as a reusable backend for content platforms and e-commerce that have outgrown rule-based filters.",
+    stack: ["Python", "Embeddings", "pgvector", "PostgreSQL"],
     github: "https://github.com/pcbeingused333/semantic-recommender",
     role: "End-to-end implementation",
   },
+];
+
+type Contribution = {
+  repo: string;
+  url: string;
+  stars: string;
+  what: string;
+  status: "merged" | "open";
+};
+
+const contributions: Contribution[] = [
   {
-    name: "Churreria Calderon",
-    tagline: "A site for a family business.",
-    description:
-      "A clean, fast website I built for a family-run churreria in Toronto — menu, story and location — and a testbed for how far AI-assisted tooling can take a static marketing site.",
-    stack: ["HTML", "CSS", "AI-assisted build"],
-    role: "Design, build, content",
+    repo: "pyfenn/fenn",
+    url: "https://github.com/pyfenn/fenn/pull/277",
+    stars: "Python framework for ML workflows and LLM agents",
+    what:
+      "Added .docx support to the RAG document loader, so the framework ingests Word documents alongside PDFs and text.",
+    status: "merged",
   },
-];const services = [
   {
-    title: "AI Assistants",
-    body: "Custom chatbots and agents that work with your own documents, data and tools. Built on modern RAG architectures with proper retrieval, evaluation and guardrails.",
+    repo: "pyfenn/fenn",
+    url: "https://github.com/pyfenn/fenn/pull/286",
+    stars: "Python framework for ML workflows and LLM agents",
+    what:
+      "Corrected the RAG optional-dependency install instructions, which pointed at a package name that does not exist.",
+    status: "merged",
   },
   {
-    title: "Web Development",
-    body: "Fast, modern websites for small businesses, restaurants and service providers. Designed to convert, easy for you to update, and built on stacks you can actually maintain.",
+    repo: "rubocop/rubocop-rspec",
+    url: "https://github.com/rubocop/rubocop-rspec/pull/2209",
+    stars: "the standard RSpec linter",
+    what:
+      "Fixed a crash in RSpec/LeadingSubject on Ruby 3.4's implicit `it` block parameter: the cop only walked `:block` AST ancestors and hit nil on the new itblock/numblock nodes. Widened the lookup to `:any_block`, with a regression spec.",
+    status: "open",
   },
   {
-    title: "Restaurant and Hospitality Tech",
-    body: "I've run a restaurant myself, so I know which problems are worth solving with software and which are not. Reservations, menus, internal automations, customer follow-up.",
+    repo: "rubocop/rubocop-performance",
+    url: "https://github.com/rubocop/rubocop-performance/pull/529",
+    stars: "performance cops for Ruby",
+    what:
+      "Fixed Performance/ConstantRegexp emitting invalid code when autocorrecting a regexp used as a pattern in case/in pattern matching.",
+    status: "open",
+  },
+  {
+    repo: "Rails-Designer/courrier",
+    url: "https://github.com/Rails-Designer/courrier/pulls?q=is%3Apr+author%3Apcbeingused333",
+    stars: "API-powered email delivery for Ruby apps",
+    what:
+      "Four PRs: MailerSend, Mailtrap and SMTP.com provider integrations, plus a NameError fix affecting Mailgun and Mailjet on Ruby 3.4.",
+    status: "open",
   },
 ];
+
 export default function Home() {
   return (
     <main className="grain min-h-screen relative">
@@ -84,22 +104,25 @@ export default function Home() {
         <span className="font-mono text-stone-500 tracking-tight">acg / 2026</span>
         <div className="flex gap-6 text-stone-600">
           <a href="#work" className="hover:text-stone-900 transition-colors">work</a>
+          <a href="#open-source" className="hover:text-stone-900 transition-colors">open source</a>
           <a href="#about" className="hover:text-stone-900 transition-colors">about</a>
           <a href="#contact" className="hover:text-stone-900 transition-colors">contact</a>
         </div>
       </nav>
+
       <section className="max-w-5xl mx-auto px-6 md:px-10 pt-24 md:pt-40 pb-24 md:pb-32">
         <p className="font-mono text-xs uppercase tracking-widest text-orange-700 mb-6">
-          Toronto, Canada &mdash; Available for projects
+          Remote &mdash; UTC&minus;4 &mdash; Open to full-time roles
         </p>
         <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.05] tracking-tight">
-          I build <em className="italic text-orange-800">AI tools</em> and
+          I ship <em className="italic text-orange-800">LLM features</em>
           <br />
-          websites for <em className="italic text-orange-800">small businesses</em>.
+          you can trust in <em className="italic text-orange-800">production</em>.
         </h1>
         <p className="mt-10 md:mt-12 text-lg md:text-xl text-stone-600 max-w-2xl leading-relaxed">
-          I am Alex, a fullstack developer who has also run a small restaurant in Toronto.
-          That combination lets me build software that actually understands how a small business runs day-to-day.
+          I am Alex, an applied AI engineer working in Python. Retrieval, agents and the
+          unglamorous part that decides whether any of it survives real users: evaluation,
+          failure handling, and knowing which numbers actually moved.
         </p>
         <div className="mt-12 flex flex-col sm:flex-row gap-4">
           <a href="#work" className="inline-flex items-center justify-center px-6 py-3 bg-stone-900 text-stone-50 rounded-full text-sm font-medium hover:bg-orange-800 transition-colors">
@@ -110,34 +133,16 @@ export default function Home() {
           </a>
         </div>
       </section>
-      <section id="about" className="border-t border-stone-200">
-        <div className="max-w-5xl mx-auto px-6 md:px-10 py-24 md:py-32 grid md:grid-cols-[1fr_2fr] gap-12">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-widest text-stone-500">01</p>
-            <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">About</h2>
-          </div>
-          <div className="space-y-6 text-stone-700 text-lg leading-relaxed">
-            <p>
-              I started programming on my own, then went through Le Wagon&apos;s fullstack bootcamp, did a three-month internship at <strong className="font-medium">Oesia</strong> building an internal document-management system, and spent some time teaching Ruby to other students.
-            </p>
-            <p>
-              I also ran <strong className="font-medium">Churreria Calderon</strong>, a small family restaurant in Toronto — which gave me a first-hand feel for how small businesses actually operate. Most of my recent work is around <strong className="font-medium">AI agents and RAG systems</strong>, the kind of tools small businesses now have access to but rarely know how to deploy.
-            </p>
-            <p>
-              I am comfortable across the stack: Python, JavaScript, TypeScript, Ruby on Rails, PostgreSQL, Docker, and the modern AI tooling layer. I care about software that ships and survives contact with real users.
-            </p>
-          </div>
-        </div>
-      </section>
+
       <section id="work" className="border-t border-stone-200">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-24 md:py-32">
           <div className="grid md:grid-cols-[1fr_2fr] gap-12 mb-16">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-stone-500">02</p>
+              <p className="font-mono text-xs uppercase tracking-widest text-stone-500">01</p>
               <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">Selected work</h2>
             </div>
             <p className="text-stone-600 text-lg leading-relaxed self-end">
-              A few recent projects across AI, open source and the web. Repos are public, feel free to look at the code.
+              Every repo is public and every demo is one click, no signup. Read the code.
             </p>
           </div>
           <div className="space-y-px bg-stone-200">
@@ -150,7 +155,12 @@ export default function Home() {
                     <span className="block text-stone-500 italic text-lg md:text-xl mt-1">{p.tagline}</span>
                   </h3>
                   <p className="mt-5 text-stone-700 leading-relaxed max-w-2xl">{p.description}</p>
-                  <p className="mt-4 text-sm text-stone-500">
+                  {p.highlight && (
+                    <p className="mt-5 border-l-2 border-orange-300 pl-5 text-stone-600 leading-relaxed max-w-2xl text-[15px]">
+                      {p.highlight}
+                    </p>
+                  )}
+                  <p className="mt-5 text-sm text-stone-500">
                     <span className="font-mono uppercase tracking-wider text-xs">Role: </span>
                     {p.role}
                   </p>
@@ -170,39 +180,96 @@ export default function Home() {
                   {p.link && (
                     <a href={p.link} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">live site</a>
                   )}
-                  {p.prs?.map((pr) => (
-                    <a key={pr.url} href={pr.url} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">{pr.label}</a>
-                  ))}
-                  {p.contributions && (
-                    <a href={p.contributions} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">all contributions</a>
-                  )}
                 </div>
               </article>
             ))}
           </div>
         </div>
       </section>
-      <section className="border-t border-stone-200 bg-stone-100">
+
+      <section id="open-source" className="border-t border-stone-200 bg-stone-100">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-24 md:py-32">
           <div className="grid md:grid-cols-[1fr_2fr] gap-12 mb-16">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-stone-500">03</p>
-              <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">What I do</h2>
+              <p className="font-mono text-xs uppercase tracking-widest text-stone-500">02</p>
+              <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">Open source</h2>
             </div>
             <p className="text-stone-600 text-lg leading-relaxed self-end">
-              I take on a small number of part-time engagements at a time. Open to one-off projects and ongoing collaborations.
+              Work on other people&apos;s codebases, reviewed by their maintainers. Status is
+              shown as it actually stands.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {services.map((s) => (
-              <div key={s.title} className="bg-white border border-stone-200 p-8 hover:border-orange-300 transition-colors">
-                <h3 className="font-serif text-2xl leading-tight">{s.title}</h3>
-                <p className="mt-4 text-stone-600 text-[15px] leading-relaxed">{s.body}</p>
-              </div>
+          <div className="space-y-px bg-stone-200">
+            {contributions.map((c) => (
+              <article key={c.url} className="bg-white py-8 px-6 md:px-10 grid md:grid-cols-[1fr_auto] gap-4 md:gap-10 items-start">
+                <div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h3 className="font-mono text-sm text-stone-900">{c.repo}</h3>
+                    <span
+                      className={
+                        c.status === "merged"
+                          ? "font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-800 text-stone-50"
+                          : "font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-stone-300 text-stone-500"
+                      }
+                    >
+                      {c.status}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-stone-500 italic">{c.stars}</p>
+                  <p className="mt-3 text-stone-700 leading-relaxed max-w-2xl text-[15px]">{c.what}</p>
+                </div>
+                <a href={c.url} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">
+                  view pr
+                </a>
+              </article>
             ))}
+          </div>
+          <p className="mt-8 text-sm text-stone-500">
+            <a href="https://github.com/pulls?q=is%3Apr+author%3Apcbeingused333" target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider hover:text-orange-800 transition-colors">
+              all contributions &rarr;
+            </a>
+          </p>
+        </div>
+      </section>
+
+      <section id="about" className="border-t border-stone-200">
+        <div className="max-w-5xl mx-auto px-6 md:px-10 py-24 md:py-32 grid md:grid-cols-[1fr_2fr] gap-12">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-widest text-stone-500">03</p>
+            <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">About</h2>
+          </div>
+          <div className="space-y-6 text-stone-700 text-lg leading-relaxed">
+            <p>
+              I started programming on my own, then went through Le Wagon&apos;s fullstack
+              bootcamp, did a three-month internship at <strong className="font-medium">Oesia</strong> building
+              an internal document-management system, and spent some time teaching Ruby to
+              other students.
+            </p>
+            <p>
+              I also built and shipped the website and an AI chat widget for{" "}
+              <a href="https://www.churreriacalderon.com" target="_blank" rel="noreferrer" className="underline decoration-stone-300 underline-offset-4 hover:decoration-orange-700">
+                Churrer&iacute;a Calder&oacute;n
+              </a>
+              , my family&apos;s business in Toronto, from 2025 until it closed in 2026.
+              Running software for a business you also have to run teaches you which problems
+              are worth solving and which are not.
+            </p>
+            <p>
+              Most of my recent work is <strong className="font-medium">RAG and agent systems in Python</strong>,
+              and increasingly the layer around them: evaluation, tracing, and the failure
+              handling that separates a demo from something you can leave running. I write
+              with AI tooling daily and treat its output the way I treat my own &mdash; measured,
+              not assumed.
+            </p>
+            <p>
+              I work fully remote on <strong className="font-medium">UTC&minus;4</strong>, overlapping with
+              North American hours. Toronto now, Santo Domingo from late 2026. Spanish native,
+              professional English.
+            </p>
           </div>
         </div>
       </section>
+
       <section id="contact" className="border-t border-stone-200">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-24 md:py-32">
           <div className="grid md:grid-cols-[1fr_2fr] gap-12">
@@ -212,19 +279,21 @@ export default function Home() {
             </div>
             <div>
               <p className="text-stone-700 text-lg leading-relaxed mb-12">
-                Working on something where AI, automation or a small custom web app would help?
-                Send me a short note, I usually reply within a day.
+                I am looking for a full-time remote engineering role building with LLMs.
+                If that is what you are hiring for, send me a short note &mdash; I usually reply
+                within a day.
               </p>
               <div className="space-y-px bg-stone-200">
                 <ContactRow label="Email" value="alex.castillog33@gmail.com" href="mailto:alex.castillog33@gmail.com" />
                 <ContactRow label="LinkedIn" value="alex-castillo-gonzalez" href="https://www.linkedin.com/in/alex-castillo-gonzalez-65a13110a/" />
                 <ContactRow label="GitHub" value="pcbeingused333" href="https://github.com/pcbeingused333" />
-                <ContactRow label="Based in" value="Toronto, Canada" />
+                <ContactRow label="Working from" value="Remote — UTC−4" />
               </div>
             </div>
           </div>
         </div>
       </section>
+
       <footer className="border-t border-stone-200">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-xs font-mono text-stone-500">
           <span>2026 Alex Castillo Gonzalez</span>
@@ -234,6 +303,7 @@ export default function Home() {
     </main>
   );
 }
+
 function ContactRow({ label, value, href }: { label: string; value: string; href?: string }) {
   const content = (
     <div className="bg-stone-50 hover:bg-white transition-colors px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 group">

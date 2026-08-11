@@ -22,16 +22,17 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const title = "Alex Castillo González — Applied AI Engineer (Python, LLM)";
+const description =
+  "Applied AI engineer working in Python: RAG, agents, and the evaluation and failure " +
+  "handling that decide whether an LLM feature survives real users. Remote, UTC−4. " +
+  "Open to full-time roles.";
+
 export const metadata: Metadata = {
-  title: "Alex Castillo González — AI & Web Developer",
-  description:
-    "I build AI tools and websites for small businesses. Toronto-based developer with a background in fullstack, AI agents, and hospitality.",
-  openGraph: {
-    title: "Alex Castillo González — AI & Web Developer",
-    description:
-      "I build AI tools and websites for small businesses. Toronto-based developer.",
-    type: "website",
-  },
+  title,
+  description,
+  openGraph: { title, description, type: "website" },
+  twitter: { card: "summary", title, description },
 };
 
 export default function RootLayout({
