@@ -17,10 +17,10 @@ const projects: Project[] = [
     name: "Business Ops Agent",
     tagline: "An agent that can only act through a protocol, and a harness that scores how it acts.",
     description:
-      "An MCP server exposing a small business's operations — catalog, booking capacity, stock, catering quotes, orders — as tools any MCP client can call: Claude Desktop, Cursor, or the LangGraph agent that ships with it. The agent holds no business rules; it does not know the catering minimum, because the quoting tool tells it. Add a tool to the server and the agent can use it with no change on the agent side.",
+      "An MCP server exposing a small business's operations — catalog, booking capacity, stock, catering quotes, orders — as tools any MCP client can call: Claude Desktop, Cursor, or the LangGraph agent that ships with it. The agent holds no business rules; it does not know the catering minimum, because the quoting tool tells it. Add a tool to the server and the agent can use it with no change on the agent side. It runs on AWS Lambda behind a public Function URL, backed by DynamoDB, with the infrastructure in Terraform and a deploy on every push to main.",
     highlight:
       "The evaluation scores the trajectory, not the answer — which tools were called, in what order, with what arguments, and whether every figure in the reply traces back to a tool result. That last check needs no judge model: pull the numbers out of the answer and confirm they appear in something a tool returned. It stays correct when an invented number happens to be right, because the question is whether the agent looked it up. It caught the agent claiming \"I don't have that information\" with zero tool calls, and caught it intermittently — the same case passed the run before, which is why the harness can repeat a scenario. Worth saying plainly: my scorer was wrong four times before it was right, and the first draft blamed the agent for its own bugs.",
-    stack: ["Python", "MCP", "LangGraph", "Groq", "SQLite", "Streamlit", "pytest"],
+    stack: ["Python", "MCP", "LangGraph", "Groq", "AWS Lambda", "DynamoDB", "Terraform", "Docker", "GitHub Actions", "Streamlit", "pytest"],
     github: "https://github.com/pcbeingused333/mcp-business-agent",
     demo: "https://mcp-business-agent-8wawhyaqt2flfixqj8dpnk.streamlit.app",
     role: "Protocol server, agent, evaluation harness, deployment",
