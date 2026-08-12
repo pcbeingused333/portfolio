@@ -299,6 +299,7 @@ export default function Home() {
                 <ContactRow label="Email" value="alex.castillog33@gmail.com" href="mailto:alex.castillog33@gmail.com" />
                 <ContactRow label="LinkedIn" value="alex-castillo-gonzalez" href="https://www.linkedin.com/in/alex-castillo-gonzalez-65a13110a/" />
                 <ContactRow label="GitHub" value="pcbeingused333" href="https://github.com/pcbeingused333" />
+                <ContactRow label="CV" value="github.com/pcbeingused333/cv" href="https://github.com/pcbeingused333/cv" />
                 <ContactRow label="Working from" value="Remote — UTC−4" />
               </div>
             </div>
