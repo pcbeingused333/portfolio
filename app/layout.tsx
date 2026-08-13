@@ -24,9 +24,9 @@ const jetbrainsMono = JetBrains_Mono({
 
 const title = "Alex Castillo González — Applied AI Engineer (Python, LLM)";
 const description =
-  "Applied AI engineer working in Python: RAG, agents, and the evaluation and failure " +
-  "handling that decide whether an LLM feature survives real users. Remote, UTC−4. " +
-  "Open to full-time roles.";
+  "Applied AI engineer working in Python: RAG over regulatory text with citations you " +
+  "can check, agents, and the evaluation and failure handling that decide whether an " +
+  "LLM feature survives real users. Remote, UTC−4. Open to full-time roles.";
 
 export const metadata: Metadata = {
   title,
