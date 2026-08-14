@@ -68,6 +68,14 @@ type Contribution = {
 
 const contributions: Contribution[] = [
   {
+    repo: "run-llama/llama_index",
+    url: "https://github.com/run-llama/llama_index/pulls?q=is%3Apr+author%3Apcbeingused333",
+    stars: "one of the two standard Python frameworks for RAG and agents",
+    what:
+      "Three fixes in llama-index-core, none of them from an issue — I found them reading the retrieval and evaluation code. The retrieval metrics returned scores outside their own range when a ranking repeated a node id, which is what fusion retrievers produce: hit rate and average precision both came back as 2.0, NDCG as 1.63, so any mean over an eval set stopped being comparable. MMR discounted each candidate only against the result picked immediately before it, so a near-duplicate stopped looking redundant as soon as anything unrelated was picked in between and returned to the ranking — the one thing MMR exists to prevent. And the multi-modal evaluator scored image nodes as text results, because ImageNode subclasses TextNode and the two type checks were written independently. Each fix ships with a test that fails without it.",
+    status: "open",
+  },
+  {
     repo: "pyfenn/fenn",
     url: "https://github.com/pyfenn/fenn/pull/277",
     stars: "Python framework for ML workflows and LLM agents",
