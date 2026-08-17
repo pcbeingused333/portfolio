@@ -68,6 +68,14 @@ type Contribution = {
 
 const contributions: Contribution[] = [
   {
+    repo: "deepset-ai/haystack",
+    url: "https://github.com/deepset-ai/haystack/pulls?q=is%3Apr+author%3Apcbeingused333",
+    stars: "26k stars — deepset's framework for production RAG and agent pipelines",
+    what:
+      "Two merged fixes, both concurrency bugs on the async path, both found by reading the components rather than from an issue. LinkContentFetcher rotated its User-Agent on a cursor kept on the component, but run() fetches the URLs concurrently: a retry triggered by one URL advanced the user agent for all the others, and each finished fetch reset the cursor underneath the requests still in flight, so most retries went out un-rotated — the one thing the feature exists to do. And EmbeddingBasedDocumentSplitter.run_async was only async for its first pass: the recursive re-split of over-long chunks called the blocking embedder, so the most expensive part of the work ran on the event loop. Two more are in review, one of them an asyncio.Lock in the OAuth token source that bound itself to whichever event loop first contended for it and raised on the second. Each ships a regression test, and I checked each one fails without the fix rather than passing either way.",
+    status: "merged",
+  },
+  {
     repo: "run-llama/llama_index",
     url: "https://github.com/run-llama/llama_index/pulls?q=is%3Apr+author%3Apcbeingused333",
     stars: "one of the two standard Python frameworks for RAG and agents",
