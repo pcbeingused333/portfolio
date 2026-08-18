@@ -63,7 +63,7 @@ type Contribution = {
   url: string;
   stars: string;
   what: string;
-  status: "merged" | "open";
+  status: "merged" | "open" | "reported";
 };
 
 const contributions: Contribution[] = [
@@ -74,6 +74,14 @@ const contributions: Contribution[] = [
     what:
       "Two merged fixes, both concurrency bugs on the async path, both found by reading the components rather than from an issue. LinkContentFetcher rotated its User-Agent on a cursor kept on the component, but run() fetches the URLs concurrently: a retry triggered by one URL advanced the user agent for all the others, and each finished fetch reset the cursor underneath the requests still in flight, so most retries went out un-rotated — the one thing the feature exists to do. And EmbeddingBasedDocumentSplitter.run_async was only async for its first pass: the recursive re-split of over-long chunks called the blocking embedder, so the most expensive part of the work ran on the event loop. Two more are in review, one of them an asyncio.Lock in the OAuth token source that bound itself to whichever event loop first contended for it and raised on the second. Each ships a regression test, and I checked each one fails without the fix rather than passing either way.",
     status: "merged",
+  },
+  {
+    repo: "deepset-ai/haystack-core-integrations",
+    url: "https://github.com/deepset-ai/haystack-core-integrations/pulls?q=is%3Apr+author%3Apcbeingused333",
+    stars: "the 100 provider integrations behind Haystack, each its own package",
+    what:
+      "Two open fixes, found with scanners I wrote for the two contracts every integration has to honour. The first: OAuthRefreshTokenSource built one asyncio.Lock and kept it for the life of the source, but that lock binds to whichever event loop first contends for it and raises on any other — so a source reused across loops, which is what one asyncio.run per request gives you, failed on the second loop's first contended refresh. The second: TransformersZeroShotTextRouter left multi_label out of to_dict, so a router saved into a pipeline came back with the flag at its default. It decides whether label scores are normalised across labels or scored independently, and the router picks its output branch from those scores — the same text can route somewhere else after a save and reload, with nothing in the saved file to show it. Its sibling component, same integration, already serialised it.",
+    status: "open",
   },
   {
     repo: "run-llama/llama_index",
@@ -122,6 +130,22 @@ const contributions: Contribution[] = [
     what:
       "Four PRs: MailerSend, Mailtrap and SMTP.com provider integrations, plus a NameError fix affecting Mailgun and Mailjet on Ruby 3.4.",
     status: "open",
+  },
+  {
+    repo: "deepset-ai/haystack-core-integrations",
+    url: "https://github.com/deepset-ai/haystack-core-integrations/issues/3789",
+    stars: "issue #3789 — triaged P3 by the maintainers",
+    what:
+      "Filed separately from the fix, with a standalone reproduction: an asyncio.Lock cached for the life of an OAuth token source binds to the first event loop that contends for it, so reusing the source in a new loop raises. Writing the report before the patch is the part that makes it reviewable — the maintainers can confirm the defect without reading my diff first.",
+    status: "reported",
+  },
+  {
+    repo: "Rails-Designer/courrier",
+    url: "https://github.com/Rails-Designer/courrier/issues/58",
+    stars: "issues #58 and #59",
+    what:
+      "cc and bcc are accepted by the gem's public API and silently dropped by 8 of its 14 email providers, so those recipients never reach the message that goes out. Found by diffing what each provider adapter does with the fields the shared interface promises. #59 is narrower and from the same pass: Mailjet sends multiple recipients as a single malformed address.",
+    status: "reported",
   },
 ];
 
@@ -223,8 +247,9 @@ export default function Home() {
               <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">Open source</h2>
             </div>
             <p className="text-stone-600 text-lg leading-relaxed self-end">
-              Work on other people&apos;s codebases, reviewed by their maintainers. Status is
-              shown as it actually stands.
+              Work on other people&apos;s codebases, reviewed by their maintainers — patches,
+              and the defects I found and reported without one. Status is shown as it
+              actually stands.
             </p>
           </div>
           <div className="space-y-px bg-stone-200">
@@ -237,7 +262,9 @@ export default function Home() {
                       className={
                         c.status === "merged"
                           ? "font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-800 text-stone-50"
-                          : "font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-stone-300 text-stone-500"
+                          : c.status === "reported"
+                            ? "font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-orange-800/40 text-orange-800"
+                            : "font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-stone-300 text-stone-500"
                       }
                     >
                       {c.status}
@@ -247,7 +274,7 @@ export default function Home() {
                   <p className="mt-3 text-stone-700 leading-relaxed max-w-2xl text-[15px]">{c.what}</p>
                 </div>
                 <a href={c.url} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">
-                  view pr
+                  {c.status === "reported" ? "view issue" : "view pr"}
                 </a>
               </article>
             ))}
