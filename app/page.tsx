@@ -280,7 +280,7 @@ export default function Home() {
             ))}
           </div>
           <p className="mt-8 text-sm text-stone-500">
-            <a href="https://github.com/pulls?q=is%3Apr+author%3Apcbeingused333" target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider hover:text-orange-800 transition-colors">
+            <a href="https://github.com/search?q=author%3Apcbeingused333+is%3Apr&amp;type=pullrequests&amp;s=updated&amp;o=desc" target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider hover:text-orange-800 transition-colors">
               all contributions &rarr;
             </a>
           </p>
