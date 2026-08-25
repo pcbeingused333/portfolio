@@ -72,7 +72,7 @@ const contributions: Contribution[] = [
     url: "https://github.com/deepset-ai/haystack/pulls?q=is%3Apr+author%3Apcbeingused333",
     stars: "26k stars — deepset's framework for production RAG and agent pipelines",
     what:
-      "Two merged fixes, both concurrency bugs on the async path, both found by reading the components rather than from an issue. LinkContentFetcher rotated its User-Agent on a cursor kept on the component, but run() fetches the URLs concurrently: a retry triggered by one URL advanced the user agent for all the others, and each finished fetch reset the cursor underneath the requests still in flight, so most retries went out un-rotated — the one thing the feature exists to do. And EmbeddingBasedDocumentSplitter.run_async was only async for its first pass: the recursive re-split of over-long chunks called the blocking embedder, so the most expensive part of the work ran on the event loop. Two more are in review, one of them an asyncio.Lock in the OAuth token source that bound itself to whichever event loop first contended for it and raised on the second. Each ships a regression test, and I checked each one fails without the fix rather than passing either way.",
+      "Three merged fixes, all concurrency bugs on the async path, all found by reading the components rather than from an issue. LinkContentFetcher rotated its User-Agent on a cursor kept on the component, but run() fetches the URLs concurrently: a retry triggered by one URL advanced the user agent for all the others, and each finished fetch reset the cursor underneath the requests still in flight, so most retries went out un-rotated — the one thing the feature exists to do. And EmbeddingBasedDocumentSplitter.run_async was only async for its first pass: the recursive re-split of over-long chunks called the blocking embedder, so the most expensive part of the work ran on the event loop. The third was the same shape one layer up: LLMDocumentContentExtractor.run_async read every file from disk, rendered its PDF pages and base64-encoded them inline, so the whole conversion ran on the event loop before the first LLM call was even scheduled. Each ships a regression test, and I checked each one fails without the fix rather than passing either way.",
     status: "merged",
   },
   {
@@ -80,8 +80,8 @@ const contributions: Contribution[] = [
     url: "https://github.com/deepset-ai/haystack-core-integrations/pulls?q=is%3Apr+author%3Apcbeingused333",
     stars: "the 100 provider integrations behind Haystack, each its own package",
     what:
-      "Two open fixes, found with scanners I wrote for the two contracts every integration has to honour. The first: OAuthRefreshTokenSource built one asyncio.Lock and kept it for the life of the source, but that lock binds to whichever event loop first contends for it and raises on any other — so a source reused across loops, which is what one asyncio.run per request gives you, failed on the second loop's first contended refresh. The second: TransformersZeroShotTextRouter left multi_label out of to_dict, so a router saved into a pipeline came back with the flag at its default. It decides whether label scores are normalised across labels or scored independently, and the router picks its output branch from those scores — the same text can route somewhere else after a save and reload, with nothing in the saved file to show it. Its sibling component, same integration, already serialised it.",
-    status: "open",
+      "Two merged fixes, found with scanners I wrote for the two contracts every integration has to honour. The first: OAuthRefreshTokenSource built one asyncio.Lock and kept it for the life of the source, but that lock binds to whichever event loop first contends for it and raises on any other — so a source reused across loops, which is what one asyncio.run per request gives you, failed on the second loop's first contended refresh. The second: three components took an init parameter, used it at run time and left it out of to_dict, so the setting silently reverted to its default once a pipeline was saved and reloaded, with nothing in the saved file to show it had ever been set. TransformersZeroShotTextRouter lost multi_label, which decides whether label scores are normalised across labels or scored independently — and the router picks its output branch from those scores, so the same text can route somewhere else after a round trip. A TEI ranker stopped asking its endpoint for raw scores, and a Ragas evaluator dropped from 16 concurrent LLM judgements back to 4. I opened them as three PRs and the maintainers reviewed them as one, which is how they merged.",
+    status: "merged",
   },
   {
     repo: "run-llama/llama_index",
@@ -134,7 +134,7 @@ const contributions: Contribution[] = [
   {
     repo: "deepset-ai/haystack-core-integrations",
     url: "https://github.com/deepset-ai/haystack-core-integrations/issues/3789",
-    stars: "issue #3789 — triaged P3 by the maintainers",
+    stars: "issue #3789 — triaged P3 by the maintainers, closed by my fix",
     what:
       "Filed separately from the fix, with a standalone reproduction: an asyncio.Lock cached for the life of an OAuth token source binds to the first event loop that contends for it, so reusing the source in a new loop raises. Writing the report before the patch is the part that makes it reviewable — the maintainers can confirm the defect without reading my diff first.",
     status: "reported",
