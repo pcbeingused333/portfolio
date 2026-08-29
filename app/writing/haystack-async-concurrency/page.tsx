@@ -10,8 +10,13 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
-  openGraph: { title, description, type: "article" },
-  twitter: { card: "summary", title, description },
+  openGraph: {
+    title,
+    description,
+    type: "article",
+    url: "/writing/haystack-async-concurrency",
+  },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 type Fix = {

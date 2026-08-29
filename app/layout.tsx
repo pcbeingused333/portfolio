@@ -29,10 +29,14 @@ const description =
   "LLM feature survives real users. Remote, UTC−4. Open to full-time roles.";
 
 export const metadata: Metadata = {
+  // Required for og:image to resolve to an absolute URL. LinkedIn drops the
+  // preview entirely when it cannot fetch the image, which is what a relative
+  // path gives it.
+  metadataBase: new URL("https://portfolio-alexgonzalez33.vercel.app"),
   title,
   description,
-  openGraph: { title, description, type: "website" },
-  twitter: { card: "summary", title, description },
+  openGraph: { title, description, type: "website", url: "/" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export default function RootLayout({
