@@ -112,8 +112,8 @@ const contributions: Contribution[] = [
     url: "https://github.com/rubocop/rubocop-rspec/pull/2209",
     stars: "the standard RSpec linter",
     what:
-      "Fixed a crash in RSpec/LeadingSubject on Ruby 3.4's implicit `it` block parameter: the cop only walked `:block` AST ancestors and hit nil on the new itblock/numblock nodes. Widened the lookup to `:any_block`, with a regression spec.",
-    status: "open",
+      "Merged. RSpec/LeadingSubject crashed on Ruby 3.4's implicit `it` block parameter: the cop walked `:block` AST ancestors only, so an example group written as an itblock or numblock was never found and the lookup returned nil. Widened to `:any_block`, with a regression spec pinned to Ruby 3.4. The spot check the maintainer asked for turned up seven more cops with the same blind spot — I opened that as a separate PR and closed it when they said they had already decided not to chase every block-syntax case, which is their call to make.",
+    status: "merged",
   },
   {
     repo: "rubocop/rubocop-performance",
