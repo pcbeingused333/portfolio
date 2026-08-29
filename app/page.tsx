@@ -124,6 +124,14 @@ const contributions: Contribution[] = [
     status: "open",
   },
   {
+    repo: "rubyforgood/human-essentials",
+    url: "https://github.com/rubyforgood/human-essentials/pull/5656",
+    stars: "Rails inventory app for nonprofit essentials banks",
+    what:
+      "The participant drop-downs displayed one column and were ordered by another, so the list was sorted on a value the user could not see — and where those collided the order fell through to the database cluster's collation, which is not the same in CI as in production. They now order on the name actually rendered, with runs of digits compared by value so Store 9 comes before Store 10. Brakeman flagged my first attempt as SQL injection, because the ordering expression interpolated into Arel.sql; it is now a literal constant with nothing interpolated. The maintainer also asked for a survey of every other drop-down in the app, so I traced each rendered select back to the query that builds it and posted the results on the issue.",
+    status: "open",
+  },
+  {
     repo: "Rails-Designer/courrier",
     url: "https://github.com/Rails-Designer/courrier/pulls?q=is%3Apr+author%3Apcbeingused333",
     stars: "API-powered email delivery for Ruby apps",
@@ -138,6 +146,14 @@ const contributions: Contribution[] = [
     what:
       "Filed separately from the fix, with a standalone reproduction: an asyncio.Lock cached for the life of an OAuth token source binds to the first event loop that contends for it, so reusing the source in a new loop raises. Writing the report before the patch is the part that makes it reviewable — the maintainers can confirm the defect without reading my diff first.",
     status: "reported",
+  },
+  {
+    repo: "rubyforgood/human-essentials",
+    url: "https://github.com/rubyforgood/human-essentials/pull/5656",
+    stars: "Rails inventory app for nonprofit essentials banks",
+    what:
+      "The participant drop-downs displayed one column and were ordered by another, so the list was sorted on a value the user could not see — and where those collided the order fell through to the database cluster's collation, which is not the same in CI as in production. They now order on the name actually rendered, with runs of digits compared by value so Store 9 comes before Store 10. Brakeman flagged my first attempt as SQL injection, because the ordering expression interpolated into Arel.sql; it is now a literal constant with nothing interpolated. The maintainer also asked for a survey of every other drop-down in the app, so I traced each rendered select back to the query that builds it and posted the results on the issue.",
+    status: "open",
   },
   {
     repo: "Rails-Designer/courrier",
