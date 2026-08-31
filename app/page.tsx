@@ -208,7 +208,7 @@ export default function Home() {
         <div className="flex gap-6 text-stone-600">
           <a href="#work" className="hover:text-stone-900 transition-colors">work</a>
           <a href="#open-source" className="hover:text-stone-900 transition-colors">open source</a>
-          <Link href="/writing/haystack-async-concurrency" className="hover:text-stone-900 transition-colors">writing</Link>
+          <Link href="/writing/to-dict-audit" className="hover:text-stone-900 transition-colors">writing</Link>
           <a href="#about" className="hover:text-stone-900 transition-colors">about</a>
           <a href="#contact" className="hover:text-stone-900 transition-colors">contact</a>
         </div>
@@ -335,6 +335,9 @@ export default function Home() {
             <a href="https://github.com/search?q=author%3Apcbeingused333+is%3Apr&amp;type=pullrequests&amp;s=updated&amp;o=desc" target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider hover:text-orange-800 transition-colors">
               all contributions &rarr;
             </a>
+            <Link href="/writing/to-dict-audit" className="font-mono text-xs uppercase tracking-wider text-orange-800 hover:text-orange-900 transition-colors">
+              write-up: the pipeline you load is not the pipeline you saved &rarr;
+            </Link>
             <Link href="/writing/haystack-async-concurrency" className="font-mono text-xs uppercase tracking-wider text-orange-800 hover:text-orange-900 transition-colors">
               write-up: four concurrency bugs on Haystack&apos;s async path &rarr;
             </Link>
