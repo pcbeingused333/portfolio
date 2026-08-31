@@ -99,7 +99,7 @@ const contributions: Contribution[] = [
     url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3873",
     stars: "PR #3873 — the same defect class as my merged fix, found again by script",
     what:
-      "After fixing three components that dropped an init parameter from to_dict, I wrote the check as a script: a small AST pass comparing every @component's __init__ parameters against the keys that actually reach default_to_dict. It flagged five more dropped settings across google_vertex, transformers and amazon_bedrock, each verified by hand. The one with teeth is VertexAITextEmbedder.task_type — it goes into every TextEmbeddingInput, so a pipeline saved as CODE_RETRIEVAL_QUERY and reloaded starts embedding as RETRIEVAL_QUERY: different vectors, no error, nothing in the saved file to show it. In every case a sibling component in the same integration already serialized the parameter, and the existing tests showed the omission was an oversight rather than a decision: one carried the three fields commented out with a note that they are not included in to_dict, another was parametrized over a value that could not change its own assertion. Four false positives the script raised are in the PR too, with why each is fine.",
+      "After fixing three components that dropped an init parameter from to_dict, I wrote the check as a script: a small AST pass comparing every @component's __init__ parameters against the keys that actually reach default_to_dict. It flagged five more dropped settings, each verified by hand. S3Downloader dropped boto3_config, which carries the timeouts, retries and proxy settings of the AWS client, while five sibling components in the same integration serialize it; TransformersExtractiveReader dropped overlap_threshold, which decides which overlapping answers get deduplicated away. In every case a sibling already serialized the parameter, and the existing tests showed the omission was an oversight rather than a decision: one was parametrized over a value that could not change its own assertion, so the parametrization could never fail. The audit also flagged google_vertex, and a maintainer pointed out on a separate issue of mine that the integration is archived — it says so in the README status table, which I had not opened. I pulled that commit; the PR covers the two active integrations. A script that reads code sees only code, and whether anyone still ships it is written somewhere else.",
     status: "open",
   },
   {
@@ -163,8 +163,24 @@ const contributions: Contribution[] = [
     url: "https://github.com/Rails-Designer/courrier/pulls?q=is%3Apr+author%3Apcbeingused333",
     stars: "API-powered email delivery for Ruby apps",
     what:
-      "Four PRs: MailerSend, Mailtrap and SMTP.com provider integrations, plus a NameError fix affecting Mailgun and Mailjet on Ruby 3.4.",
+      "Four merged: MailerSend, Mailtrap and SMTP.com provider integrations, which closed the gem's standing request for more providers, plus a NameError that broke Mailgun and Mailjet on Ruby 3.4. Base64 left Ruby's default gems in 3.4 and those two providers were the only ones calling it without requiring it, so the gem installed cleanly and raised on send — the kind of break that only shows up on the version you are not testing on.",
+    status: "merged",
+  },
+  {
+    repo: "Rails-Designer/courrier",
+    url: "https://github.com/Rails-Designer/courrier/pull/62",
+    stars: "PR #62 — the fix for a bug I reported, at the maintainer's request",
+    what:
+      "The gem accepts cc: and bcc: on every email and six of its providers never read them, so the copies were dropped with no warning: a working cc became a silent no-op the moment you switched provider. I reported it as #58 with the per-provider table; the maintainer asked for the PR. Each provider now takes the fields in the shape its own API wants — a comma-separated line for Mailgun, MailPace and Postmark, address objects for Mailjet and SendGrid. SparkPost has no cc or bcc field at all: every copy is a recipient there, and what separates a cc from a bcc is whether the address is repeated in the CC header, with header_to holding the visible To line so a bcc does not see itself addressed directly. Reading the lists through one helper also fixes Mailjet, SendGrid and SparkPost sending several to: addresses as a single malformed one — filed as #59, closed as done, still reproducible on main, which I showed in the PR.",
     status: "open",
+  },
+  {
+    repo: "pydantic/pydantic-ai",
+    url: "https://github.com/pydantic/pydantic-ai/pull/7936",
+    stars: "the agent and eval framework from the Pydantic team",
+    what:
+      "pydantic-evals reads expected_output=None as \"no expectation\", so a Case written to assert that a task returns None is skipped instead of checked: EqualsExpected records no assertion at all and the case averages 1.00 whether the task returns None or the wrong answer outright. The sentinel and the legitimate value are the same object, which is why no amount of care at the call site can tell them apart. I filed it as #7934 with a reproduction through the public API; the maintainers hold the skip as intended design, and they are right that changing it would move documented, serialized semantics. So the fix is the other one available: the trap is now stated where the behaviour is defined, with Equals(value=None) named as the evaluator that does assert it. An eval that cannot fail is worse than no eval, and a user who cannot see that from the docs will not find it from the report either.",
+    status: "merged",
   },
   {
     repo: "pydantic/pydantic-ai",
@@ -179,7 +195,7 @@ const contributions: Contribution[] = [
     url: "https://github.com/deepset-ai/haystack/issues/12519",
     stars: "issue #12519 — main was red for every contributor",
     what:
-      "My own pull request came back with a red test job I had not caused, so I checked before explaining it away: the same two tests fail on a clean main, on all three operating systems. An openai release had added three fields to its usage models, and those tests assert an exact usage dictionary. Bisected to the version — 3.5.0 passes, 3.6.0 fails, nothing else changed — and filed with the reproduction and the three field names. Another contributor picked up the fix within the hour. A second report the same night (#3874) covers an integration that ships to PyPI with no CI workflow at all, whose suite is already failing on main.",
+      "My own pull request came back with a red test job I had not caused, so I checked before explaining it away: the same two tests fail on a clean main, on all three operating systems. An openai release had added three fields to its usage models, and those tests assert an exact usage dictionary. Bisected to the version — 3.5.0 passes, 3.6.0 fails, nothing else changed — and filed with the reproduction and the three field names. A maintainer merged the fix the same day, deriving the expected usage dict from the model instead of hard-coding it, so the next additive field does not turn main red again.",
     status: "reported",
   },
   {
@@ -195,7 +211,7 @@ const contributions: Contribution[] = [
     url: "https://github.com/Rails-Designer/courrier/issues/58",
     stars: "issues #58 and #59",
     what:
-      "cc and bcc are accepted by the gem's public API and silently dropped by 8 of its 14 email providers, so those recipients never reach the message that goes out. Found by diffing what each provider adapter does with the fields the shared interface promises. #59 is narrower and from the same pass: Mailjet sends multiple recipients as a single malformed address.",
+      "cc and bcc are accepted by the gem's public API and silently dropped by 8 of its 14 email providers, so those recipients never reach the message that goes out. Found by diffing what each provider adapter does with the fields the shared interface promises, and filed with the per-provider table and a runnable reproduction rather than a single example. The maintainer asked for a PR, which is #62 above; he had already shipped the address-list helper the report suggested. #59 is narrower and from the same pass: Mailjet sends multiple recipients as a single malformed address.",
     status: "reported",
   },
 ];

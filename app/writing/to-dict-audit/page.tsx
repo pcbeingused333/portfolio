@@ -181,7 +181,7 @@ export default function Article() {
         </P>
 
         <H2>The one with teeth</H2>
-        <Meta component="VertexAITextEmbedder" pr="haystack-core-integrations#3873" url={fixes[1].url} status="open" />
+        <Meta component="VertexAITextEmbedder" pr="haystack-core-integrations#3873" url={fixes[1].url} status="withdrawn" />
         <P>
           Google&apos;s text embedding models take a <Code>task_type</Code> &mdash;{" "}
           <Code>RETRIEVAL_QUERY</Code>, <Code>RETRIEVAL_DOCUMENT</Code>,{" "}
@@ -201,6 +201,20 @@ export default function Article() {
           load it back, and it embeds as <span className="not-italic font-mono text-[0.8em]">RETRIEVAL_QUERY</span>.
           Same corpus, same code, different vectors, no error.
         </Callout>
+        <P>
+          And it is not going in. A maintainer pointed out, on a separate issue I had filed
+          about the same integration, that <Code>google_vertex</Code> is archived &mdash; it says
+          so in the status table of the top-level README, which I never opened. I pulled the
+          commit; the pull request now covers the two active integrations only. The finding
+          holds and the fix is right, and neither matters if the package is not maintained.
+        </P>
+        <P>
+          The part worth keeping is the shape of the mistake. I had already left{" "}
+          <Code>NvidiaGenerator</Code> out of the same pull request because the component is
+          deprecated, and then failed to apply that exact test one level up, at the integration.
+          A script that reads code sees only code. Whether anyone still ships it is written
+          somewhere else, and the audit had no step that went and looked.
+        </P>
         <P>
           The other four: <Code>S3Downloader</Code> dropped <Code>boto3_config</Code>, which
           carries the timeouts, retries and proxy settings of the AWS client &mdash; while five
@@ -394,7 +408,7 @@ function Meta({
   component: string;
   pr: string;
   url: string;
-  status: "merged" | "open";
+  status: "merged" | "open" | "withdrawn";
 }) {
   return (
     <p className="mt-3 mb-2 flex flex-wrap items-center gap-3 text-xs font-mono">
@@ -406,7 +420,9 @@ function Meta({
         className={
           status === "merged"
             ? "uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-800 text-stone-50 text-[10px]"
-            : "uppercase tracking-wider px-2 py-0.5 rounded-full border border-stone-300 text-stone-500 text-[10px]"
+            : status === "withdrawn"
+              ? "uppercase tracking-wider px-2 py-0.5 rounded-full border border-dashed border-stone-300 text-stone-400 text-[10px]"
+              : "uppercase tracking-wider px-2 py-0.5 rounded-full border border-stone-300 text-stone-500 text-[10px]"
         }
       >
         {status}
