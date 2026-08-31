@@ -38,6 +38,17 @@ const projects: Project[] = [
     role: "Corpus construction, retrieval pipeline, evaluation, deployment",
   },
   {
+    name: "ragcite",
+    tagline: "The measurement layer of the two projects above, extracted into a library.",
+    description:
+      "Retrieval metrics, citation grounding, abstention scoring and tool-trajectory scoring, generalized out of the two harnesses above and published. It imports no LangChain, no vector store and no LLM client: you bring the retriever and, for abstention, the judge, and ragcite scores what they return. That constraint is the design — an eval library that owns your retrieval stack can only measure the stack it owns. Retrieval and grounding need no model at all, so they are deterministic and free to run on every commit, and a --min-hit-at-1 flag turns a run into a CI gate that exits non-zero on a regression. Without a threshold flag it always exits 0: a report, not a gate, by default.",
+    highlight:
+      "The claim worth checking is that it was extracted from a production harness rather than written to look like one, so the example asserts it. It builds one FAISS index over the real GDPR corpus and scores the same 25 questions twice — once through ragcite, once through the original project's own independent metrics code — and exits non-zero if the two disagree. Sharing the index is the point: any difference can then only come from the scoring rule. They match exactly, hit@1 13/25, recall@k 17/25, MRR 0.59, which are the numbers that project prints for itself. It also refuses to run when the judge model and the model under test are the same, because that is a mistake I made and shipped: my own harness spent weeks marking a model as its own examiner before I noticed.",
+    stack: ["Python", "Evals", "CLI", "pytest", "GitHub Actions"],
+    github: "https://github.com/pcbeingused333/ragcite",
+    role: "Library, CLI, evaluation design",
+  },
+  {
     name: "AI Website Chatbot Widget",
     tagline: "An embeddable assistant that answers for a business 24/7.",
     description:
@@ -82,6 +93,22 @@ const contributions: Contribution[] = [
     what:
       "Two merged fixes, found with scanners I wrote for the two contracts every integration has to honour. The first: OAuthRefreshTokenSource built one asyncio.Lock and kept it for the life of the source, but that lock binds to whichever event loop first contends for it and raises on any other — so a source reused across loops, which is what one asyncio.run per request gives you, failed on the second loop's first contended refresh. The second: three components took an init parameter, used it at run time and left it out of to_dict, so the setting silently reverted to its default once a pipeline was saved and reloaded, with nothing in the saved file to show it had ever been set. TransformersZeroShotTextRouter lost multi_label, which decides whether label scores are normalised across labels or scored independently — and the router picks its output branch from those scores, so the same text can route somewhere else after a round trip. A TEI ranker stopped asking its endpoint for raw scores, and a Ragas evaluator dropped from 16 concurrent LLM judgements back to 4. I opened them as three PRs and the maintainers reviewed them as one, which is how they merged.",
     status: "merged",
+  },
+  {
+    repo: "deepset-ai/haystack-core-integrations",
+    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3873",
+    stars: "PR #3873 — the same defect class as my merged fix, found again by script",
+    what:
+      "After fixing three components that dropped an init parameter from to_dict, I wrote the check as a script: a small AST pass comparing every @component's __init__ parameters against the keys that actually reach default_to_dict. It flagged five more dropped settings across google_vertex, transformers and amazon_bedrock, each verified by hand. The one with teeth is VertexAITextEmbedder.task_type — it goes into every TextEmbeddingInput, so a pipeline saved as CODE_RETRIEVAL_QUERY and reloaded starts embedding as RETRIEVAL_QUERY: different vectors, no error, nothing in the saved file to show it. In every case a sibling component in the same integration already serialized the parameter, and the existing tests showed the omission was an oversight rather than a decision: one carried the three fields commented out with a note that they are not included in to_dict, another was parametrized over a value that could not change its own assertion. Four false positives the script raised are in the PR too, with why each is fine.",
+    status: "open",
+  },
+  {
+    repo: "deepset-ai/haystack",
+    url: "https://github.com/deepset-ai/haystack/pull/12518",
+    stars: "PR #12518 — the same audit, run against the framework itself",
+    what:
+      "OpenAIImageGenerator stored timeout and max_retries, used them to build its OpenAI client, and left both out of to_dict, so a saved pipeline came back with the 30-second and 5-retry fallbacks instead of the values it was configured with. Its siblings — the chat generator and both embedders — already serialize them, and the embedders because of a fix the maintainers made for exactly this in 2025. The clincher was their own test: it passed timeout=60 and max_retries=10, then asserted a dictionary containing neither.",
+    status: "open",
   },
   {
     repo: "run-llama/llama_index",
@@ -140,20 +167,28 @@ const contributions: Contribution[] = [
     status: "open",
   },
   {
+    repo: "pydantic/pydantic-ai",
+    url: "https://github.com/pydantic/pydantic-ai/issues/7927",
+    stars: "issue #7927 — accepted for implementation by the maintainers' triage",
+    what:
+      "pydantic-evals builds the judge's prompt by iterating anything that is a Sequence and is not a str. bytes, bytearray and memoryview are all Sequences, so an eval task returning binary content had it rendered as one decimal byte value per line: asked whether the output mentions a fox, the judge received 84 104 101 32 113 and graded it. No exception and no warning — a plausible score for content the judge never saw, which is the one failure an eval framework must not have. Reproduced through the public API with no provider key, using a stub model to capture the prompt. Their triage reproduced it, corrected one detail of my mechanics, and accepted it for implementation; I confirmed the correction on the issue. A second report from the same reading (#7928) is with the maintainers: a run's averages show no denominator, so an evaluator that scored 1 case of 4 reads exactly like one that scored all 4 — and a judge that runs out of quota mid-run therefore reports a higher score than the run earned.",
+    status: "reported",
+  },
+  {
+    repo: "deepset-ai/haystack",
+    url: "https://github.com/deepset-ai/haystack/issues/12519",
+    stars: "issue #12519 — main was red for every contributor",
+    what:
+      "My own pull request came back with a red test job I had not caused, so I checked before explaining it away: the same two tests fail on a clean main, on all three operating systems. An openai release had added three fields to its usage models, and those tests assert an exact usage dictionary. Bisected to the version — 3.5.0 passes, 3.6.0 fails, nothing else changed — and filed with the reproduction and the three field names. Another contributor picked up the fix within the hour. A second report the same night (#3874) covers an integration that ships to PyPI with no CI workflow at all, whose suite is already failing on main.",
+    status: "reported",
+  },
+  {
     repo: "deepset-ai/haystack-core-integrations",
     url: "https://github.com/deepset-ai/haystack-core-integrations/issues/3789",
     stars: "issue #3789 — triaged P3 by the maintainers, closed by my fix",
     what:
       "Filed separately from the fix, with a standalone reproduction: an asyncio.Lock cached for the life of an OAuth token source binds to the first event loop that contends for it, so reusing the source in a new loop raises. Writing the report before the patch is the part that makes it reviewable — the maintainers can confirm the defect without reading my diff first.",
     status: "reported",
-  },
-  {
-    repo: "rubyforgood/human-essentials",
-    url: "https://github.com/rubyforgood/human-essentials/pull/5656",
-    stars: "Rails inventory app for nonprofit essentials banks",
-    what:
-      "The participant drop-downs displayed one column and were ordered by another, so the list was sorted on a value the user could not see — and where those collided the order fell through to the database cluster's collation, which is not the same in CI as in production. They now order on the name actually rendered, with runs of digits compared by value so Store 9 comes before Store 10. Brakeman flagged my first attempt as SQL injection, because the ordering expression interpolated into Arel.sql; it is now a literal constant with nothing interpolated. The maintainer also asked for a survey of every other drop-down in the app, so I traced each rendered select back to the query that builds it and posted the results on the issue.",
-    status: "open",
   },
   {
     repo: "Rails-Designer/courrier",
