@@ -1,0 +1,34 @@
+name: Public demos are up
+
+# Every project on this site is a link someone clicks from a job application.
+# Two of them are Streamlit apps that go to sleep after a period of inactivity
+# and greet a visitor with "Zzzz"; one was pinned to a model its provider
+# retired and stayed broken for weeks because nothing ever checked. Opening them
+# on a schedule both verifies them and resets the sleep timer.
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/check_demos.py"
+      - ".github/workflows/demos-up.yml"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Playwright
+        run: |
+          pip install --quiet playwright
+          playwright install --with-deps chromium
+
+      - name: Check every public demo
+        run: python scripts/check_demos.py
