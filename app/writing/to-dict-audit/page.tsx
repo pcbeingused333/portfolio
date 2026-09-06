@@ -41,6 +41,11 @@ const fixes: Fix[] = [
     url: "https://github.com/deepset-ai/haystack/pull/12518",
     what: "open",
   },
+  {
+    pr: "haystack-core-integrations#3923",
+    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3923",
+    what: "open",
+  },
 ];
 
 export default function Article() {
@@ -303,13 +308,22 @@ restored._client_kwargs()   # {'timeout': 30.0,  'max_retries': 5}`}</Pre>
           why the output of a script like this is a reading list and never a patch.
         </P>
 
-        <H2>The one I left alone</H2>
+        <H2>The one I left alone, then didn&apos;t</H2>
         <P>
           <Code>NvidiaGenerator</Code> drops <Code>timeout</Code> exactly like the others. It
           also raises a <Code>FutureWarning</Code> on construction saying it is deprecated and
           will be removed in favour of <Code>NvidiaChatGenerator</Code>. Fixing serialization on
-          a component scheduled for deletion is churn in someone else&apos;s review queue, so it
-          is named in the pull request and left out of the diff, for the maintainers to call.
+          a component scheduled for deletion is churn in someone else&apos;s review queue, so at
+          first it was named in the pull request and left out of the diff, for the maintainers
+          to call.
+        </P>
+        <P>
+          I changed my mind and opened it as its own one-line pull request (
+          <a href="https://github.com/deepset-ai/haystack-core-integrations/pull/3923" target="_blank" rel="noreferrer" className="underline decoration-stone-300 underline-offset-2 hover:decoration-stone-500">#3923</a>).
+          Deprecated is not removed: the component still ships, still serializes, and its four
+          sibling Nvidia components all serialize <Code>timeout</Code>. A round-trip test that
+          fails without the fix costs a reviewer less than the paragraph explaining why the
+          inconsistency was left in.
         </P>
 
         <H2>What this generalises to</H2>

@@ -111,11 +111,19 @@ const contributions: Contribution[] = [
     status: "open",
   },
   {
+    repo: "deepset-ai/haystack-core-integrations",
+    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3923",
+    stars: "PR #3923 — the same audit, a later pass",
+    what:
+      "NvidiaGenerator takes a request timeout, stores it and uses it to build its backend, and leaves it out of to_dict — so a saved pipeline comes back on the 60-second fallback instead of the value it was configured with. All four sibling Nvidia components serialize it. NvidiaGenerator is deprecated in favour of NvidiaChatGenerator but still ships and still serializes, and the fix is a one-line addition plus a round-trip test that fails without it.",
+    status: "open",
+  },
+  {
     repo: "run-llama/llama_index",
     url: "https://github.com/run-llama/llama_index/pulls?q=is%3Apr+author%3Apcbeingused333",
     stars: "one of the two standard Python frameworks for RAG and agents",
     what:
-      "Three fixes in llama-index-core, none of them from an issue — I found them reading the retrieval and evaluation code. The retrieval metrics returned scores outside their own range when a ranking repeated a node id, which is what fusion retrievers produce: hit rate and average precision both came back as 2.0, NDCG as 1.63, so any mean over an eval set stopped being comparable. MMR discounted each candidate only against the result picked immediately before it, so a near-duplicate stopped looking redundant as soon as anything unrelated was picked in between and returned to the ranking — the one thing MMR exists to prevent. And the multi-modal evaluator scored image nodes as text results, because ImageNode subclasses TextNode and the two type checks were written independently. Each fix ships with a test that fails without it.",
+      "Five fixes in llama-index-core, none of them from an issue — I found them reading the retrieval and evaluation code. The retrieval metrics returned scores outside their own range when a ranking repeated a node id, which is what fusion retrievers produce: hit rate and average precision both came back as 2.0, NDCG as 1.63, so any mean over an eval set stopped being comparable. MMR discounted each candidate only against the result picked immediately before it, so a near-duplicate stopped looking redundant as soon as anything unrelated was picked in between and returned to the ranking — the one thing MMR exists to prevent. The multi-modal evaluator scored image nodes as text results, because ImageNode subclasses TextNode and the two type checks were written independently. default_parser, the parser behind CorrectnessEvaluator's judge output, unpacked a two-line response and raised ValueError — aborting the whole eval run — whenever the judge answered with a score and no reasoning line. And CohereRerankRelevancyMetric guarded a missing API-key variable with except IndexError, but a missing env var raises KeyError, so the helpful \"pass in an API key\" message never replaced the bare traceback. Each fix ships with a test that fails without it.",
     status: "open",
   },
   {
