@@ -171,16 +171,16 @@ const contributions: Contribution[] = [
     url: "https://github.com/Rails-Designer/courrier/pulls?q=is%3Apr+author%3Apcbeingused333",
     stars: "API-powered email delivery for Ruby apps",
     what:
-      "Four merged: MailerSend, Mailtrap and SMTP.com provider integrations, which closed the gem's standing request for more providers, plus a NameError that broke Mailgun and Mailjet on Ruby 3.4. Base64 left Ruby's default gems in 3.4 and those two providers were the only ones calling it without requiring it, so the gem installed cleanly and raised on send — the kind of break that only shows up on the version you are not testing on.",
+      "Four merged, all shipped in the gem's 1.1.0 release: MailerSend, Mailtrap and SMTP.com provider integrations, which closed the gem's standing request for more providers, plus a NameError that broke Mailgun and Mailjet on Ruby 3.4. Base64 left Ruby's default gems in 3.4 and those two providers were the only ones calling it without requiring it, so the gem installed cleanly and raised on send — the kind of break that only shows up on the version you are not testing on. The fifth, the cc/bcc fix below, shipped in the same release.",
     status: "merged",
   },
   {
     repo: "Rails-Designer/courrier",
     url: "https://github.com/Rails-Designer/courrier/pull/62",
-    stars: "PR #62 — the fix for a bug I reported, at the maintainer's request",
+    stars: "PR #62 — the fix for a bug I reported, at the maintainer's request; merged in courrier 1.1.0",
     what:
-      "The gem accepts cc: and bcc: on every email and six of its providers never read them, so the copies were dropped with no warning: a working cc became a silent no-op the moment you switched provider. I reported it as #58 with the per-provider table; the maintainer asked for the PR. Each provider now takes the fields in the shape its own API wants — a comma-separated line for Mailgun, MailPace and Postmark, address objects for Mailjet and SendGrid. SparkPost has no cc or bcc field at all: every copy is a recipient there, and what separates a cc from a bcc is whether the address is repeated in the CC header, with header_to holding the visible To line so a bcc does not see itself addressed directly. Reading the lists through one helper also fixes Mailjet, SendGrid and SparkPost sending several to: addresses as a single malformed one — filed as #59, closed as done, still reproducible on main, which I showed in the PR.",
-    status: "open",
+      "The gem accepts cc: and bcc: on every email and six of its providers never read them, so the copies were dropped with no warning: a working cc became a silent no-op the moment you switched provider. I reported it as #58 with the per-provider table; the maintainer asked for the PR. Each provider now takes the fields in the shape its own API wants — a comma-separated line for Mailgun, MailPace and Postmark, address objects for Mailjet and SendGrid. SparkPost has no cc or bcc field at all: every copy is a recipient there, and what separates a cc from a bcc is whether the address is repeated in the CC header, with header_to holding the visible To line so a bcc does not see itself addressed directly. Reading the lists through one helper also fixes Mailjet, SendGrid and SparkPost sending several to: addresses as a single malformed one — filed as #59, closed as done but still reproducible on main, which the PR fixed too. Merged and shipped in 1.1.0.",
+    status: "merged",
   },
   {
     repo: "pydantic/pydantic-ai",
@@ -219,7 +219,7 @@ const contributions: Contribution[] = [
     url: "https://github.com/Rails-Designer/courrier/issues/58",
     stars: "issues #58 and #59",
     what:
-      "cc and bcc are accepted by the gem's public API and silently dropped by 8 of its 14 email providers, so those recipients never reach the message that goes out. Found by diffing what each provider adapter does with the fields the shared interface promises, and filed with the per-provider table and a runnable reproduction rather than a single example. The maintainer asked for a PR, which is #62 above; he had already shipped the address-list helper the report suggested. #59 is narrower and from the same pass: Mailjet sends multiple recipients as a single malformed address.",
+      "cc and bcc are accepted by the gem's public API and silently dropped by 8 of its 14 email providers, so those recipients never reach the message that goes out. Found by diffing what each provider adapter does with the fields the shared interface promises, and filed with the per-provider table and a runnable reproduction rather than a single example. The maintainer asked for a PR, which merged as #62 above and shipped in courrier 1.1.0; he had already shipped the address-list helper the report suggested. #59 is narrower and from the same pass: Mailjet sends multiple recipients as a single malformed address.",
     status: "reported",
   },
 ];
