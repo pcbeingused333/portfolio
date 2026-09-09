@@ -99,7 +99,7 @@ const contributions: Contribution[] = [
     url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3873",
     stars: "PR #3873 — the same defect class as my merged fix, found again by script",
     what:
-      "After fixing three components that dropped an init parameter from to_dict, I wrote the check as a script: a small AST pass comparing every @component's __init__ parameters against the keys that actually reach default_to_dict. It flagged five more dropped settings, each verified by hand. S3Downloader dropped boto3_config, which carries the timeouts, retries and proxy settings of the AWS client, while five sibling components in the same integration serialize it; TransformersExtractiveReader dropped overlap_threshold, which decides which overlapping answers get deduplicated away. In every case a sibling already serialized the parameter, and the existing tests showed the omission was an oversight rather than a decision: one was parametrized over a value that could not change its own assertion, so the parametrization could never fail. The audit also flagged google_vertex, and a maintainer pointed out on a separate issue of mine that the integration is archived — it says so in the README status table, which I had not opened. I pulled that commit; the PR covers the two active integrations. A script that reads code sees only code, and whether anyone still ships it is written somewhere else.",
+      "After fixing three components that dropped an init parameter from to_dict, I wrote the check as a script: a small AST pass comparing every @component's __init__ parameters against the keys that actually reach default_to_dict. It flagged two more, each verified by hand. S3Downloader dropped boto3_config, which carries the timeouts, retries and proxy settings of the AWS client, while five sibling components in the same integration serialize it; TransformersExtractiveReader dropped overlap_threshold, which decides which overlapping answers get deduplicated away. In each case a sibling already serialized the parameter, and the existing tests showed the omission was an oversight rather than a decision: one was parametrized over a value that could not change its own assertion, so the parametrization could never fail. The audit also flagged google_vertex, and a maintainer pointed out on a separate issue of mine that the integration is archived — it says so in the README status table, which I had not opened. I pulled that commit; the PR covers the two active integrations. A script that reads code sees only code, and whether anyone still ships it is written somewhere else.",
     status: "open",
   },
   {
@@ -107,15 +107,23 @@ const contributions: Contribution[] = [
     url: "https://github.com/deepset-ai/haystack/pull/12518",
     stars: "PR #12518 — the same audit, run against the framework itself",
     what:
-      "OpenAIImageGenerator stored timeout and max_retries, used them to build its OpenAI client, and left both out of to_dict, so a saved pipeline came back with the 30-second and 5-retry fallbacks instead of the values it was configured with. Its siblings — the chat generator and both embedders — already serialize them, and the embedders because of a fix the maintainers made for exactly this in 2025. The clincher was their own test: it passed timeout=60 and max_retries=10, then asserted a dictionary containing neither.",
-    status: "open",
+      "Merged. OpenAIImageGenerator stored timeout and max_retries, used them to build its OpenAI client, and left both out of to_dict, so a saved pipeline came back with the 30-second and 5-retry fallbacks instead of the values it was configured with. Its siblings — the chat generator and both embedders — already serialize them, and the embedders because of a fix the maintainers made for exactly this in 2025. The clincher was their own test: it passed timeout=60 and max_retries=10, then asserted a dictionary containing neither.",
+    status: "merged",
   },
   {
     repo: "deepset-ai/haystack-core-integrations",
-    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3923",
-    stars: "PR #3923 — the same audit, a later pass",
+    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3925",
+    stars: "PR #3925 — the same audit, one more integration",
     what:
-      "NvidiaGenerator takes a request timeout, stores it and uses it to build its backend, and leaves it out of to_dict — so a saved pipeline comes back on the 60-second fallback instead of the value it was configured with. All four sibling Nvidia components serialize it. NvidiaGenerator is deprecated in favour of NvidiaChatGenerator but still ships and still serializes, and the fix is a one-line addition plus a round-trip test that fails without it.",
+      "Merged. AzureAISearchDocumentStore stored include_search_metadata and read it when converting search results — it decides whether Azure's @search.* fields ride along on every retrieved document — and left it out of to_dict, so the setting reverted to its default on reload. A sibling already serialized it; the round-trip test fails without the fix.",
+    status: "merged",
+  },
+  {
+    repo: "deepset-ai/haystack-core-integrations",
+    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3926",
+    stars: "PR #3926 — sync/async parity, same class as the concurrency fixes",
+    what:
+      "CohereDocumentEmbedder's sync path loops over texts in slices of batch_size before calling the embed endpoint; run_async sent them all in one call. Cohere caps texts per request, so on a real document set the async path fails where the sync path works. run_async now batches the same way, with a test asserting the batch count.",
     status: "open",
   },
   {
@@ -141,6 +149,14 @@ const contributions: Contribution[] = [
     what:
       "Corrected the RAG optional-dependency install instructions, which pointed at a package name that does not exist.",
     status: "merged",
+  },
+  {
+    repo: "pyfenn/fenn",
+    url: "https://github.com/pyfenn/fenn/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Aopen",
+    stars: "open — robustness fixes in the config and remote-client code",
+    what:
+      "Parser.load_configuration ran yaml.safe_load then indexed the result, so an empty or non-mapping fenn.yaml raised a bare TypeError into framework internals instead of a message naming the file. And RemoteClient wrapped request timeouts as the library's typed NetworkError but re-raised connection and TLS errors raw — which the CLI does not catch — so an unreachable host produced a traceback rather than a clean error. Each ships tests; the second added the first tests RemoteClient had.",
+    status: "open",
   },
   {
     repo: "rubocop/rubocop-rspec",
@@ -189,6 +205,22 @@ const contributions: Contribution[] = [
     what:
       "pydantic-evals reads expected_output=None as \"no expectation\", so a Case written to assert that a task returns None is skipped instead of checked: EqualsExpected records no assertion at all and the case averages 1.00 whether the task returns None or the wrong answer outright. The sentinel and the legitimate value are the same object, which is why no amount of care at the call site can tell them apart. I filed it as #7934 with a reproduction through the public API; the maintainers hold the skip as intended design, and they are right that changing it would move documented, serialized semantics. So the fix is the other one available: the trap is now stated where the behaviour is defined, with Equals(value=None) named as the evaluator that does assert it. An eval that cannot fail is worse than no eval, and a user who cannot see that from the docs will not find it from the report either.",
     status: "merged",
+  },
+  {
+    repo: "patterns-ai-core/langchainrb",
+    url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged",
+    stars: "the LLM framework for Ruby",
+    what:
+      "Six merged, all edge cases that crashed a caller instead of degrading. #tool_calls raised NoMethodError on a response with no usable choices — an error payload, a content-filtered completion — and on an explicit \"tool_calls\": null, which is the shape that closed the year-old issue #1011. The JSONL loader raised on a blank line; the directory loader returned an exception object into the results array where the caller then called Data methods on it; AnthropicResponse#tool_calls returned only the first tool_use block, silently dropping Claude's parallel tool calls. Each ships a regression test, and one PR was a follow-up adding the CHANGELOG lines the maintainer asked for after merging the batch.",
+    status: "merged",
+  },
+  {
+    repo: "crmne/ruby_llm",
+    url: "https://github.com/crmne/ruby_llm/pull/911",
+    stars: "PR #911 — one framework for every AI provider, in Ruby",
+    what:
+      "Two sibling tool-call parsers disagreed on the same input. ChatCompletions::Tools guards empty arguments and returns {}; Interactions::Tools ran JSON.parse on any string, so a function_call step with \"arguments\": \"\" — a valid zero-argument call — raised ToolCallParseError and failed the whole run. Mirrored the guard, with a spec covering empty string, missing key, hash passthrough and malformed JSON.",
+    status: "open",
   },
   {
     repo: "pydantic/pydantic-ai",

@@ -39,12 +39,17 @@ const fixes: Fix[] = [
   {
     pr: "haystack#12518",
     url: "https://github.com/deepset-ai/haystack/pull/12518",
-    what: "open",
+    what: "merged",
   },
   {
     pr: "haystack-core-integrations#3923",
     url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3923",
-    what: "open",
+    what: "withdrawn",
+  },
+  {
+    pr: "haystack-core-integrations#3925",
+    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3925",
+    what: "merged",
   },
 ];
 
@@ -221,14 +226,17 @@ export default function Article() {
           somewhere else, and the audit had no step that went and looked.
         </P>
         <P>
-          The other four: <Code>S3Downloader</Code> dropped <Code>boto3_config</Code>, which
-          carries the timeouts, retries and proxy settings of the AWS client &mdash; while five
-          sibling components in the same integration serialize it.{" "}
-          <Code>TransformersExtractiveReader</Code> dropped <Code>overlap_threshold</Code>,
-          which decides which overlapping answers get deduplicated away. And in Haystack itself,{" "}
+          The rest, in three more pull requests: <Code>S3Downloader</Code> dropped{" "}
+          <Code>boto3_config</Code>, which carries the timeouts, retries and proxy settings of
+          the AWS client &mdash; while five sibling components in the same integration serialize
+          it. <Code>TransformersExtractiveReader</Code> dropped <Code>overlap_threshold</Code>,
+          which decides which overlapping answers get deduplicated away.{" "}
+          <Code>AzureAISearchDocumentStore</Code> dropped <Code>include_search_metadata</Code>,
+          the flag that decides whether Azure&apos;s <Code>@search.*</Code> fields ride along on
+          every retrieved document. And in Haystack itself,{" "}
           <Code>OpenAIImageGenerator</Code> dropped <Code>timeout</Code> and{" "}
           <Code>max_retries</Code>, so a reloaded pipeline quietly went back to a 30-second
-          timeout and 5 retries.
+          timeout and 5 retries &mdash; that one and the Azure fix have since merged.
         </P>
         <Pre>{`original = OpenAIImageGenerator(timeout=120.0, max_retries=10)
 restored = OpenAIImageGenerator.from_dict(original.to_dict())
@@ -320,10 +328,11 @@ restored._client_kwargs()   # {'timeout': 30.0,  'max_retries': 5}`}</Pre>
         <P>
           I changed my mind and opened it as its own one-line pull request (
           <a href="https://github.com/deepset-ai/haystack-core-integrations/pull/3923" target="_blank" rel="noreferrer" className="underline decoration-stone-300 underline-offset-2 hover:decoration-stone-500">#3923</a>).
-          Deprecated is not removed: the component still ships, still serializes, and its four
-          sibling Nvidia components all serialize <Code>timeout</Code>. A round-trip test that
-          fails without the fix costs a reviewer less than the paragraph explaining why the
-          inconsistency was left in.
+          Deprecated is not removed: the component still shipped, still serialized, and its four
+          sibling Nvidia components all serialize <Code>timeout</Code>. A maintainer closed it a
+          week later &mdash; they are deleting the component outright in another PR, so the fix
+          has nowhere to land. The first instinct was the right one; opening it cost a reviewer
+          the thirty seconds to say so.
         </P>
 
         <H2>What this generalises to</H2>
@@ -348,7 +357,7 @@ restored._client_kwargs()   # {'timeout': 30.0,  'max_retries': 5}`}</Pre>
 
         <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3">
           <a href="https://github.com/deepset-ai/haystack-core-integrations/pull/3873" target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-orange-800 hover:text-orange-900 transition-colors">
-            PR: five settings, three integrations &rarr;
+            PR: two settings, two integrations &rarr;
           </a>
           <a href="https://github.com/deepset-ai/haystack/pull/12518" target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-orange-800 hover:text-orange-900 transition-colors">
             PR: haystack#12518 &rarr;
