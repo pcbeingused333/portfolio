@@ -254,6 +254,22 @@ const contributions: Contribution[] = [
       "cc and bcc are accepted by the gem's public API and silently dropped by 8 of its 14 email providers, so those recipients never reach the message that goes out. Found by diffing what each provider adapter does with the fields the shared interface promises, and filed with the per-provider table and a runnable reproduction rather than a single example. The maintainer asked for a PR, which merged as #62 above and shipped in courrier 1.1.0; he had already shipped the address-list helper the report suggested. #59 is narrower and from the same pass: Mailjet sends multiple recipients as a single malformed address.",
     status: "reported",
   },
+  {
+    repo: "confident-ai/deepeval",
+    url: "https://github.com/confident-ai/deepeval/pulls?q=is%3Apr+author%3Apcbeingused333",
+    stars: "18k stars — LLM evaluation framework",
+    what:
+      "Four fixes, all found by reading the metric and benchmark code rather than from an issue. A custom judge model returning (text, cost) worked under a_measure() and raised AttributeError under measure() — the async helper unwrapped that tuple, the sync one never did, a gap left over from a fix to only one side after an internal test hit it (#3270). TruthfulQA's MC2 scorer counted every repeated correct index in a model's structured output, so a repeated answer pushed the reported percentage past 100 (#3271) — the same class of defect as my llama-index fix above, in a different framework. HumanEval's reported accuracy treated each task's pass@k estimate as a pass/fail flag instead of averaging it: two tasks scoring 0.3 and 0.4 pass@1 printed \"Overall HumanEval Accuracy: 1.0\" (#3272). And IFEval's lowercase/uppercase checker failed a response with no letters at all, like \"42\", because str.islower() requires a cased character to return True — a stricter condition than the instruction it was checking (#3273). Each ships a regression test verified to fail without the fix.",
+    status: "open",
+  },
+  {
+    repo: "comet-ml/opik",
+    url: "https://github.com/comet-ml/opik/pull/8276",
+    stars: "22k stars — LLM evaluation and observability platform",
+    what:
+      "SpearmanRanking checked that two rankings had the same length and the same set of items, but not that each was actually a permutation. A duplicate that kept both sets equal slipped through, and the rank lookup — a dict comprehension — silently kept only the last occurrence's index, returning a numeric correlation for an input whose ranks were never well defined instead of raising. Filed as issue #8275 with the reproduction first, per the repo's own contribution process, then opened as a draft PR with both fixes and tests.",
+    status: "open",
+  },
 ];
 
 export default function Home() {
