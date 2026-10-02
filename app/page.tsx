@@ -99,8 +99,8 @@ const contributions: Contribution[] = [
     url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3873",
     stars: "PR #3873 — the same defect class as my merged fix, found again by script",
     what:
-      "After fixing three components that dropped an init parameter from to_dict, I wrote the check as a script: a small AST pass comparing every @component's __init__ parameters against the keys that actually reach default_to_dict. It flagged two more, each verified by hand. S3Downloader dropped boto3_config, which carries the timeouts, retries and proxy settings of the AWS client, while five sibling components in the same integration serialize it; TransformersExtractiveReader dropped overlap_threshold, which decides which overlapping answers get deduplicated away. In each case a sibling already serialized the parameter, and the existing tests showed the omission was an oversight rather than a decision: one was parametrized over a value that could not change its own assertion, so the parametrization could never fail. The audit also flagged google_vertex, and a maintainer pointed out on a separate issue of mine that the integration is archived — it says so in the README status table, which I had not opened. I pulled that commit; the PR covers the two active integrations. A script that reads code sees only code, and whether anyone still ships it is written somewhere else.",
-    status: "open",
+      "Merged. After fixing three components that dropped an init parameter from to_dict, I wrote the check as a script: a small AST pass comparing every @component's __init__ parameters against the keys that actually reach default_to_dict. It flagged two more, each verified by hand. S3Downloader dropped boto3_config, which carries the timeouts, retries and proxy settings of the AWS client, while five sibling components in the same integration serialize it; TransformersExtractiveReader dropped overlap_threshold, which decides which overlapping answers get deduplicated away. In each case a sibling already serialized the parameter, and the existing tests showed the omission was an oversight rather than a decision: one was parametrized over a value that could not change its own assertion, so the parametrization could never fail. The audit also flagged google_vertex, and a maintainer pointed out on a separate issue of mine that the integration is archived — it says so in the README status table, which I had not opened. I pulled that commit; the PR covers the two active integrations. A script that reads code sees only code, and whether anyone still ships it is written somewhere else.",
+    status: "merged",
   },
   {
     repo: "deepset-ai/haystack",
@@ -123,8 +123,8 @@ const contributions: Contribution[] = [
     url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3926",
     stars: "PR #3926 — sync/async parity, same class as the concurrency fixes",
     what:
-      "CohereDocumentEmbedder's sync path loops over texts in slices of batch_size before calling the embed endpoint; run_async sent them all in one call. Cohere caps texts per request, so on a real document set the async path fails where the sync path works. run_async now batches the same way, with a test asserting the batch count.",
-    status: "open",
+      "Merged. CohereDocumentEmbedder's sync path loops over texts in slices of batch_size before calling the embed endpoint; run_async sent them all in one call. Cohere caps texts per request, so on a real document set the async path fails where the sync path works. run_async now batches the same way, with a test asserting the batch count.",
+    status: "merged",
   },
   {
     repo: "run-llama/llama_index",
@@ -267,8 +267,8 @@ const contributions: Contribution[] = [
     url: "https://github.com/comet-ml/opik/pull/8276",
     stars: "22k stars — LLM evaluation and observability platform",
     what:
-      "SpearmanRanking checked that two rankings had the same length and the same set of items, but not that each was actually a permutation. A duplicate that kept both sets equal slipped through, and the rank lookup — a dict comprehension — silently kept only the last occurrence's index, returning a numeric correlation for an input whose ranks were never well defined instead of raising. Filed as issue #8275 with the reproduction first, per the repo's own contribution process, then opened as a draft PR with both fixes and tests.",
-    status: "open",
+      "Merged. SpearmanRanking checked that two rankings had the same length and the same set of items, but not that each was actually a permutation. A duplicate that kept both sets equal slipped through, and the rank lookup — a dict comprehension — silently kept only the last occurrence's index, returning a numeric correlation for an input whose ranks were never well defined instead of raising. Filed as issue #8275 with the reproduction first, per the repo's own contribution process.",
+    status: "merged",
   },
 ];
 
