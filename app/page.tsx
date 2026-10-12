@@ -179,15 +179,15 @@ const contributions: Contribution[] = [
     url: "https://github.com/rubyforgood/human-essentials/pull/5656",
     stars: "Rails inventory app for nonprofit essentials banks",
     what:
-      "The participant drop-downs displayed one column and were ordered by another, so the list was sorted on a value the user could not see — and where those collided the order fell through to the database cluster's collation, which is not the same in CI as in production. They now order on the name actually rendered, with runs of digits compared by value so Store 9 comes before Store 10. Brakeman flagged my first attempt as SQL injection, because the ordering expression interpolated into Arel.sql; it is now a literal constant with nothing interpolated. The maintainer also asked for a survey of every other drop-down in the app, so I traced each rendered select back to the query that builds it and posted the results on the issue.",
-    status: "open",
+      "Merged. The participant drop-downs displayed one column and were ordered by another, so the list was sorted on a value the user could not see — and where those collided the order fell through to the database cluster's collation, which is not the same in CI as in production. They now order on the name actually rendered, with runs of digits compared by value so Store 9 comes before Store 10. Brakeman flagged my first attempt as SQL injection, because the ordering expression interpolated into Arel.sql; it is now a literal constant with nothing interpolated. The maintainer also asked for a survey of every other drop-down in the app, so I traced each rendered select back to the query that builds it and posted the results on the issue.",
+    status: "merged",
   },
   {
     repo: "Rails-Designer/courrier",
     url: "https://github.com/Rails-Designer/courrier/pulls?q=is%3Apr+author%3Apcbeingused333",
     stars: "API-powered email delivery for Ruby apps",
     what:
-      "Four merged, all shipped in the gem's 1.1.0 release: MailerSend, Mailtrap and SMTP.com provider integrations, which closed the gem's standing request for more providers, plus a NameError that broke Mailgun and Mailjet on Ruby 3.4. Base64 left Ruby's default gems in 3.4 and those two providers were the only ones calling it without requiring it, so the gem installed cleanly and raised on send — the kind of break that only shows up on the version you are not testing on. The fifth, the cc/bcc fix below, shipped in the same release.",
+      "Four merged, all shipped in the gem's 1.1.0 release: MailerSend, Mailtrap and SMTP.com provider integrations, which closed the gem's standing request for more providers, plus a NameError that broke Mailgun and Mailjet on Ruby 3.4. Base64 left Ruby's default gems in 3.4 and those two providers were the only ones calling it without requiring it, so the gem installed cleanly and raised on send — the kind of break that only shows up on the version you are not testing on. The fifth, the cc/bcc fix below, shipped in the same release. Six more have merged since, the same class of quiet break each time: a quoted display name with a comma torn in two by the recipient splitter, a backslash in a display name corrupting the header, `width: 100%` in an HTML layout raising ArgumentError because the body was substituted with String#%, a 204 with no body raising TypeError on a request that succeeded, and subscriber calls addressing the wrong member because the email was never URL-encoded (or, for Mailchimp, never hashed).",
     status: "merged",
   },
   {
@@ -211,16 +211,24 @@ const contributions: Contribution[] = [
     url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged",
     stars: "the LLM framework for Ruby",
     what:
-      "Six merged, all edge cases that crashed a caller instead of degrading. #tool_calls raised NoMethodError on a response with no usable choices — an error payload, a content-filtered completion — and on an explicit \"tool_calls\": null, which is the shape that closed the year-old issue #1011. The JSONL loader raised on a blank line; the directory loader returned an exception object into the results array where the caller then called Data methods on it; AnthropicResponse#tool_calls returned only the first tool_use block, silently dropping Claude's parallel tool calls. Each ships a regression test, and one PR was a follow-up adding the CHANGELOG lines the maintainer asked for after merging the batch.",
+      "Nine merged. Six are edge cases that crashed a caller instead of degrading. #tool_calls raised NoMethodError on a response with no usable choices — an error payload, a content-filtered completion — and on an explicit \"tool_calls\": null, which is the shape that closed the year-old issue #1011. The JSONL loader raised on a blank line; the directory loader returned an exception object into the results array where the caller then called Data methods on it; AnthropicResponse#tool_calls returned only the first tool_use block, silently dropping Claude's parallel tool calls. Each ships a regression test, and one PR was a follow-up adding the CHANGELOG lines the maintainer asked for after merging the batch. Two more keep it working on current Claude models: Anthropic#chat sent temperature 0.0 on every request, which those models reject with a 400, and a streamed reply with a thinking block — the default on Claude 5 — left a nil in the content and raised. The third made PromptTemplate#format a single pass, so user input containing {context} is no longer expanded as a placeholder.",
     status: "merged",
   },
   {
-    repo: "crmne/ruby_llm",
-    url: "https://github.com/crmne/ruby_llm/pull/911",
-    stars: "PR #911 — one framework for every AI provider, in Ruby",
+    repo: "Tencent/WeKnora",
+    url: "https://github.com/Tencent/WeKnora/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged",
+    stars: "33k stars — Tencent's LLM knowledge platform (RAG, agents, wiki)",
     what:
-      "Two sibling tool-call parsers disagreed on the same input. ChatCompletions::Tools guards empty arguments and returns {}; Interactions::Tools ran JSON.parse on any string, so a function_call step with \"arguments\": \"\" — a valid zero-argument call — raised ToolCallParseError and failed the whole run. Mirrored the guard, with a spec covering empty string, missing key, hash passthrough and malformed JSON.",
-    status: "open",
+      "Two merged. Six current Claude models were catalogued as accepting temperature and top_p, so the internal pipelines that set one — query understanding, entity extraction, compaction, data analysis — got a 400 on exactly those models. Both flags had to change: with only the temperature one, the adapter fell through to sending top_p instead. The follow-up, which the maintainers agreed on in review, added catalog entries for Claude Opus, Sonnet and Haiku 5.5, which otherwise resolved to vendor defaults they reject.",
+    status: "merged",
+  },
+  {
+    repo: "posit-dev/chatlas",
+    url: "https://github.com/posit-dev/chatlas/pull/448",
+    stars: "Posit's Python library for LLM chat apps",
+    what:
+      "Merged. ChatBedrockAnthropic(reasoning=) only took a token budget, which its own default model rejects with a 400, so there was no way to turn thinking on with the defaults. It now takes an effort level the way ChatAnthropic already did, through one helper both share, with a test that fails on the old code.",
+    status: "merged",
   },
   {
     repo: "pydantic/pydantic-ai",
