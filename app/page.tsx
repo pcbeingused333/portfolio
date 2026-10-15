@@ -69,214 +69,91 @@ const projects: Project[] = [
   },
 ];
 
-type Contribution = {
-  repo: string;
-  url: string;
-  stars: string;
+type Theme = {
+  title: string;
+  count: string;
   what: string;
-  status: "merged" | "open" | "reported";
+  examples: { label: string; url: string }[];
 };
 
-const contributions: Contribution[] = [
+const ossStats = [
+  { value: "66", label: "merged pull requests" },
+  { value: "17", label: "projects" },
+  { value: "2 days", label: "median time to merge" },
+  { value: "28", label: "merged within 24 hours" },
+];
+
+const themes: Theme[] = [
   {
-    repo: "deepset-ai/haystack",
-    url: "https://github.com/deepset-ai/haystack/pulls?q=is%3Apr+author%3Apcbeingused333",
-    stars: "26k stars — deepset's framework for production RAG and agent pipelines",
+    title: "When the LLM provider changes, the code built on it breaks",
+    count: "~12 projects · median ~8 hours to merge",
     what:
-      "Three merged fixes, all concurrency bugs on the async path, all found by reading the components rather than from an issue. LinkContentFetcher rotated its User-Agent on a cursor kept on the component, but run() fetches the URLs concurrently: a retry triggered by one URL advanced the user agent for all the others, and each finished fetch reset the cursor underneath the requests still in flight, so most retries went out un-rotated — the one thing the feature exists to do. And EmbeddingBasedDocumentSplitter.run_async was only async for its first pass: the recursive re-split of over-long chunks called the blocking embedder, so the most expensive part of the work ran on the event loop. The third was the same shape one layer up: LLMDocumentContentExtractor.run_async read every file from disk, rendered its PDF pages and base64-encoded them inline, so the whole conversion ran on the event loop before the first LLM call was even scheduled. Each ships a regression test, and I checked each one fails without the fix rather than passing either way.",
-    status: "merged",
+      "Claude 5 and the 1.x Anthropic SDK broke the same few assumptions across about a dozen projects: reading a reply as content[0].text when the first block is now a thinking block, sending a temperature or a forced tool_choice that current models reject with a 400, calling the removed Text Completions API, and model catalogs that did not recognise new or Bedrock model IDs. These merged fastest of anything I sent, because users were hitting them that week.",
+    examples: [
+      { label: "WeKnora #4155", url: "https://github.com/Tencent/WeKnora/pull/4155" },
+      { label: "hostedgpt #823", url: "https://github.com/AllYourBot/hostedgpt/pull/823" },
+      { label: "TruLens #2948", url: "https://github.com/truera/trulens/pull/2948" },
+      { label: "reward-bench #290", url: "https://github.com/allenai/reward-bench/pull/290" },
+    ],
   },
   {
-    repo: "deepset-ai/haystack-core-integrations",
-    url: "https://github.com/deepset-ai/haystack-core-integrations/pulls?q=is%3Apr+author%3Apcbeingused333",
-    stars: "the 100 provider integrations behind Haystack, each its own package",
+    title: "Async paths in Haystack that drifted from the sync ones",
+    count: "12 merged in Haystack and its integrations",
     what:
-      "Two merged fixes, found with scanners I wrote for the two contracts every integration has to honour. The first: OAuthRefreshTokenSource built one asyncio.Lock and kept it for the life of the source, but that lock binds to whichever event loop first contends for it and raises on any other — so a source reused across loops, which is what one asyncio.run per request gives you, failed on the second loop's first contended refresh. The second: three components took an init parameter, used it at run time and left it out of to_dict, so the setting silently reverted to its default once a pipeline was saved and reloaded, with nothing in the saved file to show it had ever been set. TransformersZeroShotTextRouter lost multi_label, which decides whether label scores are normalised across labels or scored independently — and the router picks its output branch from those scores, so the same text can route somewhere else after a round trip. A TEI ranker stopped asking its endpoint for raw scores, and a Ragas evaluator dropped from 16 concurrent LLM judgements back to 4. I opened them as three PRs and the maintainers reviewed them as one, which is how they merged.",
-    status: "merged",
+      "run_async implementations that ran blocking work on the event loop, held an asyncio.Lock across event loops, ignored max_workers, skipped batching or re-wrapped errors the sync path re-raises. These bugs hide from test suites that only call run(). Four of the twelve came from auditing every component's __init__ against to_dict, where a setting silently reverted when a saved pipeline was reloaded.",
+    examples: [
+      { label: "integrations #3790", url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3790" },
+      { label: "haystack #12662", url: "https://github.com/deepset-ai/haystack/pull/12662" },
+      { label: "integrations #3808", url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3808" },
+    ],
   },
   {
-    repo: "deepset-ai/haystack-core-integrations",
-    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3873",
-    stars: "PR #3873 — the same defect class as my merged fix, found again by script",
+    title: "The provider and tool-calling layer of LangChain.rb",
+    count: "22 merged, usually the same day",
     what:
-      "Merged. After fixing three components that dropped an init parameter from to_dict, I wrote the check as a script: a small AST pass comparing every @component's __init__ parameters against the keys that actually reach default_to_dict. It flagged two more, each verified by hand. S3Downloader dropped boto3_config, which carries the timeouts, retries and proxy settings of the AWS client, while five sibling components in the same integration serialize it; TransformersExtractiveReader dropped overlap_threshold, which decides which overlapping answers get deduplicated away. In each case a sibling already serialized the parameter, and the existing tests showed the omission was an oversight rather than a decision: one was parametrized over a value that could not change its own assertion, so the parametrization could never fail. The audit also flagged google_vertex, and a maintainer pointed out on a separate issue of mine that the integration is archived — it says so in the README status table, which I had not opened. I pulled that commit; the PR covers the two active integrations. A script that reads code sees only code, and whether anyone still ships it is written somewhere else.",
-    status: "merged",
+      "Fixes across its Anthropic, OpenAI, Gemini, Ollama, Cohere and Mistral adapters: tool_choice sent in the shape each API expects, an agent loop that could never stop calling a forced tool, streamed tool calls lost on Ollama, thinking blocks dropped from the tool-use loop, a migration to the Cohere v2 API, and tool errors handed back to the LLM instead of ending the run.",
+    examples: [
+      { label: "#1063", url: "https://github.com/patterns-ai-core/langchainrb/pull/1063" },
+      { label: "#1058", url: "https://github.com/patterns-ai-core/langchainrb/pull/1058" },
+      { label: "all 22", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
+    ],
   },
   {
-    repo: "deepset-ai/haystack",
-    url: "https://github.com/deepset-ai/haystack/pull/12518",
-    stars: "PR #12518 — the same audit, run against the framework itself",
+    title: "One rare but legitimate input that brings down the whole flow",
+    count: "courrier 11 · perron 4 · icons 2 · LangChain.rb",
     what:
-      "Merged. OpenAIImageGenerator stored timeout and max_retries, used them to build its OpenAI client, and left both out of to_dict, so a saved pipeline came back with the 30-second and 5-retry fallbacks instead of the values it was configured with. Its siblings — the chat generator and both embedders — already serialize them, and the embedders because of a fix the maintainers made for exactly this in 2025. The clincher was their own test: it passed timeout=60 and max_retries=10, then asserted a dictionary containing neither.",
-    status: "merged",
+      "An empty choices list, a nil body, a division by zero, a bare % in an email layout — very often inside a rescue or except written to catch a different exception, so the guard was there and still missed. In the courrier mail gem this also meant three new providers and cc/bcc that six providers had been silently dropping.",
+    examples: [
+      { label: "courrier #62", url: "https://github.com/Rails-Designer/courrier/pull/62" },
+      { label: "courrier #67", url: "https://github.com/Rails-Designer/courrier/pull/67" },
+      { label: "perron #215", url: "https://github.com/Rails-Designer/perron/pull/215" },
+    ],
   },
   {
-    repo: "deepset-ai/haystack-core-integrations",
-    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3925",
-    stars: "PR #3925 — the same audit, one more integration",
+    title: "Evaluation metrics that return a wrong number without failing",
+    count: "merged in Opik, Phoenix, pydantic-ai · open in llama-index, deepeval",
     what:
-      "Merged. AzureAISearchDocumentStore stored include_search_metadata and read it when converting search results — it decides whether Azure's @search.* fields ride along on every retrieved document — and left it out of to_dict, so the setting reverted to its default on reload. A sibling already serialized it; the round-trip test fails without the fix.",
-    status: "merged",
+      "Retrieval metrics scoring above 1.0 on rankings with repeated ids, pass@k averaged as pass/fail, a Spearman correlation computed on rankings with duplicates, an eval case that could never fail, and a judge grading binary output it received as one decimal byte per line. The work closest to what I build, and the slowest to land: most of it is still in review.",
+    examples: [
+      { label: "opik #8276", url: "https://github.com/comet-ml/opik/pull/8276" },
+      { label: "pydantic-ai #7927", url: "https://github.com/pydantic/pydantic-ai/issues/7927" },
+      { label: "llama_index #22683", url: "https://github.com/run-llama/llama_index/pull/22683" },
+    ],
+  },
+];
+
+const lessons = [
+  {
+    title: "Depth beats spread",
+    what: "Going back to a maintainer who already trusts the work pays more than a first PR somewhere new. LangChain.rb went from 6 merged to 22.",
   },
   {
-    repo: "deepset-ai/haystack-core-integrations",
-    url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3926",
-    stars: "PR #3926 — sync/async parity, same class as the concurrency fixes",
-    what:
-      "Merged. CohereDocumentEmbedder's sync path loops over texts in slices of batch_size before calling the embed endpoint; run_async sent them all in one call. Cohere caps texts per request, so on a real document set the async path fails where the sync path works. run_async now batches the same way, with a test asserting the batch count.",
-    status: "merged",
+    title: "Timing beats volume",
+    what: "A fix for what a release broke this week merges in hours. The same quality of fix for a long-standing edge case can wait weeks.",
   },
   {
-    repo: "run-llama/llama_index",
-    url: "https://github.com/run-llama/llama_index/pulls?q=is%3Apr+author%3Apcbeingused333",
-    stars: "one of the two standard Python frameworks for RAG and agents",
-    what:
-      "Five fixes in llama-index-core, none of them from an issue — I found them reading the retrieval and evaluation code. The retrieval metrics returned scores outside their own range when a ranking repeated a node id, which is what fusion retrievers produce: hit rate and average precision both came back as 2.0, NDCG as 1.63, so any mean over an eval set stopped being comparable. MMR discounted each candidate only against the result picked immediately before it, so a near-duplicate stopped looking redundant as soon as anything unrelated was picked in between and returned to the ranking — the one thing MMR exists to prevent. The multi-modal evaluator scored image nodes as text results, because ImageNode subclasses TextNode and the two type checks were written independently. default_parser, the parser behind CorrectnessEvaluator's judge output, unpacked a two-line response and raised ValueError — aborting the whole eval run — whenever the judge answered with a score and no reasoning line. And CohereRerankRelevancyMetric guarded a missing API-key variable with except IndexError, but a missing env var raises KeyError, so the helpful \"pass in an API key\" message never replaced the bare traceback. Each fix ships with a test that fails without it.",
-    status: "open",
-  },
-  {
-    repo: "pyfenn/fenn",
-    url: "https://github.com/pyfenn/fenn/pull/277",
-    stars: "Python framework for ML workflows and LLM agents",
-    what:
-      "Added .docx support to the RAG document loader, so the framework ingests Word documents alongside PDFs and text.",
-    status: "merged",
-  },
-  {
-    repo: "pyfenn/fenn",
-    url: "https://github.com/pyfenn/fenn/pull/286",
-    stars: "Python framework for ML workflows and LLM agents",
-    what:
-      "Corrected the RAG optional-dependency install instructions, which pointed at a package name that does not exist.",
-    status: "merged",
-  },
-  {
-    repo: "pyfenn/fenn",
-    url: "https://github.com/pyfenn/fenn/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Aopen",
-    stars: "open — robustness fixes in the config and remote-client code",
-    what:
-      "Parser.load_configuration ran yaml.safe_load then indexed the result, so an empty or non-mapping fenn.yaml raised a bare TypeError into framework internals instead of a message naming the file. And RemoteClient wrapped request timeouts as the library's typed NetworkError but re-raised connection and TLS errors raw — which the CLI does not catch — so an unreachable host produced a traceback rather than a clean error. Each ships tests; the second added the first tests RemoteClient had.",
-    status: "open",
-  },
-  {
-    repo: "rubocop/rubocop-rspec",
-    url: "https://github.com/rubocop/rubocop-rspec/pull/2209",
-    stars: "the standard RSpec linter",
-    what:
-      "Merged. RSpec/LeadingSubject crashed on Ruby 3.4's implicit `it` block parameter: the cop walked `:block` AST ancestors only, so an example group written as an itblock or numblock was never found and the lookup returned nil. Widened to `:any_block`, with a regression spec pinned to Ruby 3.4. The spot check the maintainer asked for turned up seven more cops with the same blind spot — I opened that as a separate PR and closed it when they said they had already decided not to chase every block-syntax case, which is their call to make.",
-    status: "merged",
-  },
-  {
-    repo: "rubocop/rubocop-performance",
-    url: "https://github.com/rubocop/rubocop-performance/pull/529",
-    stars: "performance cops for Ruby",
-    what:
-      "Fixed Performance/ConstantRegexp emitting invalid code when autocorrecting a regexp used as a pattern in case/in pattern matching.",
-    status: "open",
-  },
-  {
-    repo: "rubyforgood/human-essentials",
-    url: "https://github.com/rubyforgood/human-essentials/pull/5656",
-    stars: "Rails inventory app for nonprofit essentials banks",
-    what:
-      "Merged. The participant drop-downs displayed one column and were ordered by another, so the list was sorted on a value the user could not see — and where those collided the order fell through to the database cluster's collation, which is not the same in CI as in production. They now order on the name actually rendered, with runs of digits compared by value so Store 9 comes before Store 10. Brakeman flagged my first attempt as SQL injection, because the ordering expression interpolated into Arel.sql; it is now a literal constant with nothing interpolated. The maintainer also asked for a survey of every other drop-down in the app, so I traced each rendered select back to the query that builds it and posted the results on the issue.",
-    status: "merged",
-  },
-  {
-    repo: "Rails-Designer/courrier",
-    url: "https://github.com/Rails-Designer/courrier/pulls?q=is%3Apr+author%3Apcbeingused333",
-    stars: "API-powered email delivery for Ruby apps",
-    what:
-      "Four merged, all shipped in the gem's 1.1.0 release: MailerSend, Mailtrap and SMTP.com provider integrations, which closed the gem's standing request for more providers, plus a NameError that broke Mailgun and Mailjet on Ruby 3.4. Base64 left Ruby's default gems in 3.4 and those two providers were the only ones calling it without requiring it, so the gem installed cleanly and raised on send — the kind of break that only shows up on the version you are not testing on. The fifth, the cc/bcc fix below, shipped in the same release. Six more have merged since, the same class of quiet break each time: a quoted display name with a comma torn in two by the recipient splitter, a backslash in a display name corrupting the header, `width: 100%` in an HTML layout raising ArgumentError because the body was substituted with String#%, a 204 with no body raising TypeError on a request that succeeded, and subscriber calls addressing the wrong member because the email was never URL-encoded (or, for Mailchimp, never hashed).",
-    status: "merged",
-  },
-  {
-    repo: "Rails-Designer/courrier",
-    url: "https://github.com/Rails-Designer/courrier/pull/62",
-    stars: "PR #62 — the fix for a bug I reported, at the maintainer's request; merged in courrier 1.1.0",
-    what:
-      "The gem accepts cc: and bcc: on every email and six of its providers never read them, so the copies were dropped with no warning: a working cc became a silent no-op the moment you switched provider. I reported it as #58 with the per-provider table; the maintainer asked for the PR. Each provider now takes the fields in the shape its own API wants — a comma-separated line for Mailgun, MailPace and Postmark, address objects for Mailjet and SendGrid. SparkPost has no cc or bcc field at all: every copy is a recipient there, and what separates a cc from a bcc is whether the address is repeated in the CC header, with header_to holding the visible To line so a bcc does not see itself addressed directly. Reading the lists through one helper also fixes Mailjet, SendGrid and SparkPost sending several to: addresses as a single malformed one — filed as #59, closed as done but still reproducible on main, which the PR fixed too. Merged and shipped in 1.1.0.",
-    status: "merged",
-  },
-  {
-    repo: "pydantic/pydantic-ai",
-    url: "https://github.com/pydantic/pydantic-ai/pull/7936",
-    stars: "the agent and eval framework from the Pydantic team",
-    what:
-      "pydantic-evals reads expected_output=None as \"no expectation\", so a Case written to assert that a task returns None is skipped instead of checked: EqualsExpected records no assertion at all and the case averages 1.00 whether the task returns None or the wrong answer outright. The sentinel and the legitimate value are the same object, which is why no amount of care at the call site can tell them apart. I filed it as #7934 with a reproduction through the public API; the maintainers hold the skip as intended design, and they are right that changing it would move documented, serialized semantics. So the fix is the other one available: the trap is now stated where the behaviour is defined, with Equals(value=None) named as the evaluator that does assert it. An eval that cannot fail is worse than no eval, and a user who cannot see that from the docs will not find it from the report either.",
-    status: "merged",
-  },
-  {
-    repo: "patterns-ai-core/langchainrb",
-    url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged",
-    stars: "the LLM framework for Ruby",
-    what:
-      "Nine merged. Six are edge cases that crashed a caller instead of degrading. #tool_calls raised NoMethodError on a response with no usable choices — an error payload, a content-filtered completion — and on an explicit \"tool_calls\": null, which is the shape that closed the year-old issue #1011. The JSONL loader raised on a blank line; the directory loader returned an exception object into the results array where the caller then called Data methods on it; AnthropicResponse#tool_calls returned only the first tool_use block, silently dropping Claude's parallel tool calls. Each ships a regression test, and one PR was a follow-up adding the CHANGELOG lines the maintainer asked for after merging the batch. Two more keep it working on current Claude models: Anthropic#chat sent temperature 0.0 on every request, which those models reject with a 400, and a streamed reply with a thinking block — the default on Claude 5 — left a nil in the content and raised. The third made PromptTemplate#format a single pass, so user input containing {context} is no longer expanded as a placeholder.",
-    status: "merged",
-  },
-  {
-    repo: "Tencent/WeKnora",
-    url: "https://github.com/Tencent/WeKnora/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged",
-    stars: "33k stars — Tencent's LLM knowledge platform (RAG, agents, wiki)",
-    what:
-      "Two merged. Six current Claude models were catalogued as accepting temperature and top_p, so the internal pipelines that set one — query understanding, entity extraction, compaction, data analysis — got a 400 on exactly those models. Both flags had to change: with only the temperature one, the adapter fell through to sending top_p instead. The follow-up, which the maintainers agreed on in review, added catalog entries for Claude Opus, Sonnet and Haiku 5.5, which otherwise resolved to vendor defaults they reject.",
-    status: "merged",
-  },
-  {
-    repo: "posit-dev/chatlas",
-    url: "https://github.com/posit-dev/chatlas/pull/448",
-    stars: "Posit's Python library for LLM chat apps",
-    what:
-      "Merged. ChatBedrockAnthropic(reasoning=) only took a token budget, which its own default model rejects with a 400, so there was no way to turn thinking on with the defaults. It now takes an effort level the way ChatAnthropic already did, through one helper both share, with a test that fails on the old code.",
-    status: "merged",
-  },
-  {
-    repo: "pydantic/pydantic-ai",
-    url: "https://github.com/pydantic/pydantic-ai/issues/7927",
-    stars: "issue #7927 — accepted for implementation by the maintainers' triage",
-    what:
-      "pydantic-evals builds the judge's prompt by iterating anything that is a Sequence and is not a str. bytes, bytearray and memoryview are all Sequences, so an eval task returning binary content had it rendered as one decimal byte value per line: asked whether the output mentions a fox, the judge received 84 104 101 32 113 and graded it. No exception and no warning — a plausible score for content the judge never saw, which is the one failure an eval framework must not have. Reproduced through the public API with no provider key, using a stub model to capture the prompt. Their triage reproduced it, corrected one detail of my mechanics, and accepted it for implementation; I confirmed the correction on the issue. A second report from the same reading (#7928) is with the maintainers: a run's averages show no denominator, so an evaluator that scored 1 case of 4 reads exactly like one that scored all 4 — and a judge that runs out of quota mid-run therefore reports a higher score than the run earned.",
-    status: "reported",
-  },
-  {
-    repo: "deepset-ai/haystack",
-    url: "https://github.com/deepset-ai/haystack/issues/12519",
-    stars: "issue #12519 — main was red for every contributor",
-    what:
-      "My own pull request came back with a red test job I had not caused, so I checked before explaining it away: the same two tests fail on a clean main, on all three operating systems. An openai release had added three fields to its usage models, and those tests assert an exact usage dictionary. Bisected to the version — 3.5.0 passes, 3.6.0 fails, nothing else changed — and filed with the reproduction and the three field names. A maintainer merged the fix the same day, deriving the expected usage dict from the model instead of hard-coding it, so the next additive field does not turn main red again.",
-    status: "reported",
-  },
-  {
-    repo: "deepset-ai/haystack-core-integrations",
-    url: "https://github.com/deepset-ai/haystack-core-integrations/issues/3789",
-    stars: "issue #3789 — triaged P3 by the maintainers, closed by my fix",
-    what:
-      "Filed separately from the fix, with a standalone reproduction: an asyncio.Lock cached for the life of an OAuth token source binds to the first event loop that contends for it, so reusing the source in a new loop raises. Writing the report before the patch is the part that makes it reviewable — the maintainers can confirm the defect without reading my diff first.",
-    status: "reported",
-  },
-  {
-    repo: "Rails-Designer/courrier",
-    url: "https://github.com/Rails-Designer/courrier/issues/58",
-    stars: "issues #58 and #59",
-    what:
-      "cc and bcc are accepted by the gem's public API and silently dropped by 8 of its 14 email providers, so those recipients never reach the message that goes out. Found by diffing what each provider adapter does with the fields the shared interface promises, and filed with the per-provider table and a runnable reproduction rather than a single example. The maintainer asked for a PR, which merged as #62 above and shipped in courrier 1.1.0; he had already shipped the address-list helper the report suggested. #59 is narrower and from the same pass: Mailjet sends multiple recipients as a single malformed address.",
-    status: "reported",
-  },
-  {
-    repo: "confident-ai/deepeval",
-    url: "https://github.com/confident-ai/deepeval/pulls?q=is%3Apr+author%3Apcbeingused333",
-    stars: "18k stars — LLM evaluation framework",
-    what:
-      "Four fixes, all found by reading the metric and benchmark code rather than from an issue. A custom judge model returning (text, cost) worked under a_measure() and raised AttributeError under measure() — the async helper unwrapped that tuple, the sync one never did, a gap left over from a fix to only one side after an internal test hit it (#3270). TruthfulQA's MC2 scorer counted every repeated correct index in a model's structured output, so a repeated answer pushed the reported percentage past 100 (#3271) — the same class of defect as my llama-index fix above, in a different framework. HumanEval's reported accuracy treated each task's pass@k estimate as a pass/fail flag instead of averaging it: two tasks scoring 0.3 and 0.4 pass@1 printed \"Overall HumanEval Accuracy: 1.0\" (#3272). And IFEval's lowercase/uppercase checker failed a response with no letters at all, like \"42\", because str.islower() requires a cased character to return True — a stricter condition than the instruction it was checking (#3273). Each ships a regression test verified to fail without the fix.",
-    status: "open",
-  },
-  {
-    repo: "comet-ml/opik",
-    url: "https://github.com/comet-ml/opik/pull/8276",
-    stars: "22k stars — LLM evaluation and observability platform",
-    what:
-      "Merged. SpearmanRanking checked that two rankings had the same length and the same set of items, but not that each was actually a permutation. A duplicate that kept both sets equal slipped through, and the rank lookup — a dict comprehension — silently kept only the last occurrence's index, returning a numeric correlation for an input whose ranks were never well defined instead of raising. Filed as issue #8275 with the reproduction first, per the repo's own contribution process.",
-    status: "merged",
+    title: "Make it cheap to review",
+    what: "Small PRs, a regression test I have seen fail with the fix reverted, and the local run pasted in. Where CI does not run for forks, that pasted run is the only evidence a reviewer sees.",
   },
 ];
 
@@ -379,37 +256,45 @@ export default function Home() {
               <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">Open source</h2>
             </div>
             <p className="text-stone-600 text-lg leading-relaxed self-end">
-              Work on other people&apos;s codebases, reviewed by their maintainers — patches,
-              and the defects I found and reported without one. Status is shown as it
-              actually stands.
+              Fixes to other people&apos;s codebases, reviewed by their maintainers. Most I found
+              by reading the code or tracking a provider change, and each ships a regression test
+              I have seen fail with the fix reverted. They fall into five patterns.
             </p>
           </div>
+          <dl className="grid grid-cols-2 md:grid-cols-4 gap-px bg-stone-200 mb-px">
+            {ossStats.map((st) => (
+              <div key={st.label} className="bg-white px-6 py-6">
+                <dt className="font-mono text-[10px] uppercase tracking-wider text-stone-500">{st.label}</dt>
+                <dd className="font-serif text-3xl md:text-4xl mt-2 text-orange-800">{st.value}</dd>
+              </div>
+            ))}
+          </dl>
           <div className="space-y-px bg-stone-200">
-            {contributions.map((c) => (
-              <article key={c.url} className="bg-white py-8 px-6 md:px-10 grid md:grid-cols-[1fr_auto] gap-4 md:gap-10 items-start">
-                <div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h3 className="font-mono text-sm text-stone-900">{c.repo}</h3>
-                    <span
-                      className={
-                        c.status === "merged"
-                          ? "font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-800 text-stone-50"
-                          : c.status === "reported"
-                            ? "font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-orange-800/40 text-orange-800"
-                            : "font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-stone-300 text-stone-500"
-                      }
-                    >
-                      {c.status}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-stone-500 italic">{c.stars}</p>
-                  <p className="mt-3 text-stone-700 leading-relaxed max-w-2xl text-[15px]">{c.what}</p>
+            {themes.map((t) => (
+              <article key={t.title} className="bg-white py-8 px-6 md:px-10">
+                <h3 className="font-serif text-xl md:text-2xl leading-snug text-stone-900">{t.title}</h3>
+                <p className="mt-1 font-mono text-xs text-stone-500">{t.count}</p>
+                <p className="mt-3 text-stone-700 leading-relaxed max-w-2xl text-[15px]">{t.what}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {t.examples.map((e) => (
+                    <a key={e.url} href={e.url} target="_blank" rel="noreferrer" className="font-mono text-xs px-2.5 py-1 border border-stone-300 rounded-full text-stone-600 hover:text-orange-800 hover:border-orange-800/40 transition-colors">
+                      {e.label}
+                    </a>
+                  ))}
                 </div>
-                <a href={c.url} target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider text-stone-600 hover:text-orange-800 transition-colors whitespace-nowrap">
-                  {c.status === "reported" ? "view issue" : "view pr"}
-                </a>
               </article>
             ))}
+          </div>
+          <div className="mt-16">
+            <h3 className="font-mono text-xs uppercase tracking-widest text-stone-500">What I learned</h3>
+            <div className="mt-6 grid md:grid-cols-3 gap-8">
+              {lessons.map((l) => (
+                <div key={l.title}>
+                  <p className="font-serif text-xl text-stone-900">{l.title}</p>
+                  <p className="mt-2 text-stone-600 leading-relaxed text-[15px]">{l.what}</p>
+                </div>
+              ))}
+            </div>
           </div>
           <p className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm text-stone-500">
             <a href="https://github.com/search?q=author%3Apcbeingused333+is%3Apr&amp;type=pullrequests&amp;s=updated&amp;o=desc" target="_blank" rel="noreferrer" className="font-mono text-xs uppercase tracking-wider hover:text-orange-800 transition-colors">
