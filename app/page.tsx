@@ -77,10 +77,10 @@ type Theme = {
 };
 
 const ossStats = [
-  { value: "91", label: "merged pull requests" },
-  { value: "21", label: "projects" },
+  { value: "110", label: "merged pull requests" },
+  { value: "32", label: "projects" },
   { value: "< 1 day", label: "median time to merge" },
-  { value: "50", label: "merged within 24 hours" },
+  { value: "67", label: "merged within 24 hours" },
 ];
 
 const themes: Theme[] = [
@@ -109,13 +109,13 @@ const themes: Theme[] = [
   },
   {
     title: "The provider and tool-calling layer of LangChain.rb",
-    count: "30 merged, usually the same day",
+    count: "29 merged, usually the same day",
     what:
       "Fixes across its Anthropic, OpenAI, Gemini, Ollama, Cohere and Mistral adapters: tool_choice sent in the shape each API expects, an agent loop that could never stop calling a forced tool, streamed tool calls lost on Ollama, thinking blocks dropped from the tool-use loop, a migration to the Cohere v2 API, and tool errors handed back to the LLM instead of ending the run.",
     examples: [
       { label: "#1063", url: "https://github.com/patterns-ai-core/langchainrb/pull/1063" },
       { label: "#1058", url: "https://github.com/patterns-ai-core/langchainrb/pull/1058" },
-      { label: "all 30", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
+      { label: "all 29", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
     ],
   },
   {
@@ -131,13 +131,13 @@ const themes: Theme[] = [
   },
   {
     title: "Flows that break for real users of a Rails app",
-    count: "9 merged in Sure (personal finance, 10k★)",
+    count: "12 merged in Sure (personal finance, 10k★)",
     what:
       "Sure is a full Rails product, not a library, so the bugs are the ones users click into: provider setup from Add Account that bounced back to Settings or hid its own error, buttons that sent the wrong HTTP method, \"Create a bill\" from a transaction rendering Content Missing, and merging a pending duplicate that threw away its attachments, tags and notes.",
     examples: [
       { label: "sure #4278", url: "https://github.com/we-promise/sure/pull/4278" },
       { label: "sure #4247", url: "https://github.com/we-promise/sure/pull/4247" },
-      { label: "all 9", url: "https://github.com/we-promise/sure/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
+      { label: "all 12", url: "https://github.com/we-promise/sure/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
     ],
   },
   {
@@ -156,7 +156,7 @@ const themes: Theme[] = [
 const lessons = [
   {
     title: "Depth beats spread",
-    what: "Going back to a maintainer who already trusts the work pays more than a first PR somewhere new. LangChain.rb went from 6 merged to 30.",
+    what: "Going back to a maintainer who already trusts the work pays more than a first PR somewhere new. LangChain.rb went from 6 merged to 29.",
   },
   {
     title: "Timing beats volume",
