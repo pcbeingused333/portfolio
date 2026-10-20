@@ -77,10 +77,77 @@ type Theme = {
 };
 
 const ossStats = [
-  { value: "110", label: "merged pull requests" },
-  { value: "32", label: "projects" },
-  { value: "< 1 day", label: "median time to merge" },
-  { value: "67", label: "merged within 24 hours" },
+  { value: "160", label: "merged pull requests" },
+  { value: "64", label: "projects" },
+  { value: "83%", label: "of decided PRs merged" },
+  { value: "16 h", label: "median time to merge" },
+];
+
+type CaseStudy = {
+  project: string;
+  title: string;
+  bug: string;
+  cause: string;
+  fix: string;
+  impact: string;
+  links: { label: string; url: string }[];
+};
+
+const caseStudies: CaseStudy[] = [
+  {
+    project: "LiteLLM",
+    title: "Streamed calls billed differently from non-streamed ones",
+    bug: "A streamed Vertex AI pass-through call cost less than the same call non-streamed.",
+    cause: "The stream builder priced the call without its location, so regional endpoints missed their 10% uplift and custom-priced deployments fell back to list price.",
+    fix: "The logger prices both modes, including streams cut off midway, with the deployment's location.",
+    impact: "Spend tracking in a 61k★ proxy now matches across streaming and non-streaming.",
+    links: [{ label: "litellm #44795", url: "https://github.com/BerriAI/litellm/pull/44795" }],
+  },
+  {
+    project: "LLM Tornado",
+    title: "Three parallel tool calls executed six times",
+    bug: "With Anthropic streaming and Microsoft.Extensions.AI, each parallel tool ran more than once and the follow-up request was rejected.",
+    cause: "Every content_block_stop re-yielded all tool calls seen so far (1, then 1+2, then 1+2+3), and the tool-invocation middleware acted on each.",
+    fix: "Yield the calls once, at the end of the stream, with the final usage.",
+    impact: "Merged the same day; seven merged in the repo, including streamed input and cache token counts.",
+    links: [
+      { label: "#205", url: "https://github.com/lofcz/LLMTornado/pull/205" },
+      { label: "#214", url: "https://github.com/lofcz/LLMTornado/pull/214" },
+    ],
+  },
+  {
+    project: "Haystack (deepset)",
+    title: "Async paths that drifted from the sync ones",
+    bug: "50 expanded queries meant 50 concurrent embedding calls whatever the limit; an asyncio.Lock was shared across event loops.",
+    cause: "run_async re-implemented run without its guards, and the test suites only called run.",
+    fix: "Restore the limits and per-loop locks, with async tests.",
+    impact: "12 merged across Haystack and its integrations.",
+    links: [
+      { label: "haystack #12662", url: "https://github.com/deepset-ai/haystack/pull/12662" },
+      { label: "integrations #3790", url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3790" },
+    ],
+  },
+  {
+    project: "LangChain.rb",
+    title: "The provider and tool-calling layer",
+    bug: "tool_choice sent in the wrong shape per API, an agent loop that could never stop calling a forced tool, streamed tool calls lost on Ollama, thinking blocks dropped from the tool-use loop.",
+    cause: "Six provider adapters, each translating tool calls its own way.",
+    fix: "One adapter at a time across Anthropic, OpenAI, Gemini, Ollama, Cohere and Mistral.",
+    impact: "29 merged, most the same day.",
+    links: [{ label: "all 29", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" }],
+  },
+  {
+    project: "AgentScope-Java · go-micro",
+    title: "Default models that stop working on a date",
+    bug: "SDKs defaulting to Claude models that Anthropic retires, or already had.",
+    cause: "Hard-coded model IDs, and in AgentScope a context-window table with no Claude 5 entry, so the obvious one-line swap would have resolved the window to 0.",
+    fix: "New default plus the missing table entry, with a test that fails on the old one.",
+    impact: "Merged the same day in both.",
+    links: [
+      { label: "agentscope-java #3670", url: "https://github.com/agentscope-ai/agentscope-java/pull/3670" },
+      { label: "go-micro #5011", url: "https://github.com/micro/go-micro/pull/5011" },
+    ],
+  },
 ];
 
 const themes: Theme[] = [
@@ -192,9 +259,11 @@ export default function Home() {
           you can trust in <em className="italic text-orange-800">production</em>.
         </h1>
         <p className="mt-10 md:mt-12 text-lg md:text-xl text-stone-600 max-w-2xl leading-relaxed">
-          I am Alex, an applied AI engineer working in Python. Retrieval, agents and the
-          unglamorous part that decides whether any of it survives real users: evaluation,
-          failure handling, and knowing which numbers actually moved.
+          I am Alex, an applied AI engineer working in Python. Most of my recent work is the
+          integration layer between applications and LLM providers: streamed tool calls,
+          token and cost accounting, and code that breaks when a provider changes or retires a
+          model. I fix it upstream, in the SDKs themselves, and I build retrieval and agent
+          systems with the evaluation that decides whether they survive real users.
         </p>
         <div className="mt-12 flex flex-col sm:flex-row gap-4">
           <a href="#work" className="inline-flex items-center justify-center px-6 py-3 bg-stone-900 text-stone-50 rounded-full text-sm font-medium hover:bg-orange-800 transition-colors">
@@ -267,9 +336,10 @@ export default function Home() {
               <h2 className="font-serif text-3xl md:text-4xl mt-3 leading-tight">Open source</h2>
             </div>
             <p className="text-stone-600 text-lg leading-relaxed self-end">
-              Fixes to other people&apos;s codebases, reviewed by their maintainers. Most I found
-              by reading the code or tracking a provider change, and each ships a regression test
-              I have seen fail with the fix reverted. They fall into six patterns.
+              Fixes to other people&apos;s codebases, reviewed by their maintainers, mostly in the
+              layer between applications and LLM providers. Each ships a regression test that
+              fails without the fix. Five case studies first, then the six patterns the work
+              falls into.
             </p>
           </div>
           <dl className="grid grid-cols-2 md:grid-cols-4 gap-px bg-stone-200 mb-px">
@@ -280,6 +350,30 @@ export default function Home() {
               </div>
             ))}
           </dl>
+          <div className="space-y-px bg-stone-200 mb-16">
+            {caseStudies.map((c) => (
+              <article key={c.title} className="bg-white py-8 px-6 md:px-10">
+                <p className="font-mono text-xs uppercase tracking-wider text-orange-800">{c.project}</p>
+                <h3 className="font-serif text-xl md:text-2xl leading-snug text-stone-900 mt-1">{c.title}</h3>
+                <dl className="mt-4 grid md:grid-cols-[90px_1fr] gap-x-6 gap-y-2 max-w-3xl text-[15px]">
+                  {([["Bug", c.bug], ["Cause", c.cause], ["Fix", c.fix], ["Impact", c.impact]] as const).map(([k, v]) => (
+                    <div key={k} className="contents">
+                      <dt className="font-mono text-xs uppercase tracking-wider text-stone-500 pt-1">{k}</dt>
+                      <dd className="text-stone-700 leading-relaxed">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {c.links.map((e) => (
+                    <a key={e.url} href={e.url} target="_blank" rel="noreferrer" className="font-mono text-xs px-2.5 py-1 border border-stone-300 rounded-full text-stone-600 hover:text-orange-800 hover:border-orange-800/40 transition-colors">
+                      {e.label}
+                    </a>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+          <h3 className="font-mono text-xs uppercase tracking-widest text-stone-500 mb-6">Patterns</h3>
           <div className="space-y-px bg-stone-200">
             {themes.map((t) => (
               <article key={t.title} className="bg-white py-8 px-6 md:px-10">

@@ -51,7 +51,7 @@ export default function Image() {
             paddingTop: 28,
           }}
         >
-          <div>5 merged fixes in Haystack · deepset</div>
+          <div>160 merged fixes in LLM SDKs and frameworks</div>
           <div>Remote · UTC−4</div>
         </div>
       </div>
