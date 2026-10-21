@@ -77,10 +77,10 @@ type Theme = {
 };
 
 const ossStats = [
-  { value: "160", label: "merged pull requests" },
-  { value: "64", label: "projects" },
-  { value: "83%", label: "of decided PRs merged" },
-  { value: "16 h", label: "median time to merge" },
+  { value: "209", label: "merged pull requests" },
+  { value: "75", label: "projects" },
+  { value: "84%", label: "of decided PRs merged" },
+  { value: "11 h", label: "median time to merge" },
 ];
 
 type CaseStudy = {
@@ -109,7 +109,7 @@ const caseStudies: CaseStudy[] = [
     bug: "With Anthropic streaming and Microsoft.Extensions.AI, each parallel tool ran more than once and the follow-up request was rejected.",
     cause: "Every content_block_stop re-yielded all tool calls seen so far (1, then 1+2, then 1+2+3), and the tool-invocation middleware acted on each.",
     fix: "Yield the calls once, at the end of the stream, with the final usage.",
-    impact: "Merged the same day; seven merged in the repo, including streamed input and cache token counts.",
+    impact: "Merged the same day; 13 merged in the repo, including streamed input and cache token counts.",
     links: [
       { label: "#205", url: "https://github.com/lofcz/LLMTornado/pull/205" },
       { label: "#214", url: "https://github.com/lofcz/LLMTornado/pull/214" },
@@ -133,8 +133,8 @@ const caseStudies: CaseStudy[] = [
     bug: "tool_choice sent in the wrong shape per API, an agent loop that could never stop calling a forced tool, streamed tool calls lost on Ollama, thinking blocks dropped from the tool-use loop.",
     cause: "Six provider adapters, each translating tool calls its own way.",
     fix: "One adapter at a time across Anthropic, OpenAI, Gemini, Ollama, Cohere and Mistral.",
-    impact: "29 merged, most the same day.",
-    links: [{ label: "all 29", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" }],
+    impact: "30 merged, most the same day.",
+    links: [{ label: "all 30", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" }],
   },
   {
     project: "AgentScope-Java · go-micro",
@@ -176,13 +176,13 @@ const themes: Theme[] = [
   },
   {
     title: "The provider and tool-calling layer of LangChain.rb",
-    count: "29 merged, usually the same day",
+    count: "30 merged, usually the same day",
     what:
       "Fixes across its Anthropic, OpenAI, Gemini, Ollama, Cohere and Mistral adapters: tool_choice sent in the shape each API expects, an agent loop that could never stop calling a forced tool, streamed tool calls lost on Ollama, thinking blocks dropped from the tool-use loop, a migration to the Cohere v2 API, and tool errors handed back to the LLM instead of ending the run.",
     examples: [
       { label: "#1063", url: "https://github.com/patterns-ai-core/langchainrb/pull/1063" },
       { label: "#1058", url: "https://github.com/patterns-ai-core/langchainrb/pull/1058" },
-      { label: "all 29", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
+      { label: "all 30", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
     ],
   },
   {
@@ -198,13 +198,13 @@ const themes: Theme[] = [
   },
   {
     title: "Flows that break for real users of a Rails app",
-    count: "12 merged in Sure (personal finance, 10k★)",
+    count: "13 merged in Sure (personal finance, 10k★)",
     what:
       "Sure is a full Rails product, not a library, so the bugs are the ones users click into: provider setup from Add Account that bounced back to Settings or hid its own error, buttons that sent the wrong HTTP method, \"Create a bill\" from a transaction rendering Content Missing, and merging a pending duplicate that threw away its attachments, tags and notes.",
     examples: [
       { label: "sure #4278", url: "https://github.com/we-promise/sure/pull/4278" },
       { label: "sure #4247", url: "https://github.com/we-promise/sure/pull/4247" },
-      { label: "all 12", url: "https://github.com/we-promise/sure/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
+      { label: "all 13", url: "https://github.com/we-promise/sure/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
     ],
   },
   {
@@ -223,7 +223,7 @@ const themes: Theme[] = [
 const lessons = [
   {
     title: "Depth beats spread",
-    what: "Going back to a maintainer who already trusts the work pays more than a first PR somewhere new. LangChain.rb went from 6 merged to 29.",
+    what: "Going back to a maintainer who already trusts the work pays more than a first PR somewhere new. LangChain.rb went from 6 merged to 30.",
   },
   {
     title: "Timing beats volume",

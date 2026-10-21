@@ -51,7 +51,7 @@ export default function Image() {
             paddingTop: 28,
           }}
         >
-          <div>160 merged fixes in LLM SDKs and frameworks</div>
+          <div>209 merged fixes in LLM SDKs and frameworks</div>
           <div>Remote · UTC−4</div>
         </div>
       </div>
