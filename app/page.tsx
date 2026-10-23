@@ -49,6 +49,18 @@ const projects: Project[] = [
     role: "Library, CLI, evaluation design",
   },
   {
+    name: "Weather-Aware Truck Routing",
+    tagline: "The safest truck route, judged by the forecast for the hour the truck reaches each point.",
+    description:
+      "A React + Django app built as a full-stack take-home. It asks Valhalla for three truck routes with the real gross weight, so roads with weight limits are respected, samples each route every 10, 25 or 50 miles, and gives every checkpoint an ETA from the router's own maneuver timings. Each checkpoint reads the hourly wind, rain and snow forecast for that ETA and gets a risk level from the brief's thresholds plus load rules: strong wind with a heavy load becomes Severe or No Travel. Routes are ranked by No Travel, Severe and High miles, then average risk, then travel time, and the map colours the chosen route by risk next to a 0–48 h forecast heatmap of the corridor.",
+    highlight:
+      "Most of the judgment went into edge cases the brief left open. Its ranges share endpoints, so a value on a boundary goes to the higher band, because this is a safety tool; a stretch between two checkpoints takes the worse of the two, since over-counting dangerous miles is safer than under-counting them. The free services pushed back too: Open-Meteo rate-limits the shared IP of a free Render instance, so on a 429 the backend asks the browser to fetch the forecast points itself and send them back, and the ranking still runs on the server. The rules are pure functions with table-driven tests.",
+    stack: ["React", "TypeScript", "MapLibre GL", "Django", "Python", "Valhalla", "Open-Meteo", "Render", "GitHub Actions", "pytest"],
+    github: "https://github.com/pcbeingused333/weather-truck-routing",
+    demo: "https://weather-truck-routing-p4iz.onrender.com",
+    role: "Design, full build, deployment",
+  },
+  {
     name: "AI Website Chatbot Widget",
     tagline: "An embeddable assistant that answers for a business 24/7.",
     description:
