@@ -89,10 +89,10 @@ type Theme = {
 };
 
 const ossStats = [
-  { value: "209", label: "merged pull requests" },
-  { value: "75", label: "projects" },
-  { value: "84%", label: "of decided PRs merged" },
-  { value: "11 h", label: "median time to merge" },
+  { value: "429", label: "merged pull requests" },
+  { value: "101", label: "projects" },
+  { value: "86%", label: "of decided PRs merged" },
+  { value: "16 h", label: "median time to merge" },
 ];
 
 type CaseStudy = {
@@ -121,7 +121,7 @@ const caseStudies: CaseStudy[] = [
     bug: "With Anthropic streaming and Microsoft.Extensions.AI, each parallel tool ran more than once and the follow-up request was rejected.",
     cause: "Every content_block_stop re-yielded all tool calls seen so far (1, then 1+2, then 1+2+3), and the tool-invocation middleware acted on each.",
     fix: "Yield the calls once, at the end of the stream, with the final usage.",
-    impact: "Merged the same day; 13 merged in the repo, including streamed input and cache token counts.",
+    impact: "Merged the same day; 69 merged in the repo, including streamed input and cache token counts.",
     links: [
       { label: "#205", url: "https://github.com/lofcz/LLMTornado/pull/205" },
       { label: "#214", url: "https://github.com/lofcz/LLMTornado/pull/214" },
@@ -133,7 +133,7 @@ const caseStudies: CaseStudy[] = [
     bug: "50 expanded queries meant 50 concurrent embedding calls whatever the limit; an asyncio.Lock was shared across event loops.",
     cause: "run_async re-implemented run without its guards, and the test suites only called run.",
     fix: "Restore the limits and per-loop locks, with async tests.",
-    impact: "12 merged across Haystack and its integrations.",
+    impact: "13 merged across Haystack and its integrations.",
     links: [
       { label: "haystack #12662", url: "https://github.com/deepset-ai/haystack/pull/12662" },
       { label: "integrations #3790", url: "https://github.com/deepset-ai/haystack-core-integrations/pull/3790" },
@@ -145,8 +145,8 @@ const caseStudies: CaseStudy[] = [
     bug: "tool_choice sent in the wrong shape per API, an agent loop that could never stop calling a forced tool, streamed tool calls lost on Ollama, thinking blocks dropped from the tool-use loop.",
     cause: "Six provider adapters, each translating tool calls its own way.",
     fix: "One adapter at a time across Anthropic, OpenAI, Gemini, Ollama, Cohere and Mistral.",
-    impact: "30 merged, most the same day.",
-    links: [{ label: "all 30", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" }],
+    impact: "31 merged, most the same day.",
+    links: [{ label: "all 31", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" }],
   },
   {
     project: "AgentScope-Java · go-micro",
@@ -177,7 +177,7 @@ const themes: Theme[] = [
   },
   {
     title: "Async paths in Haystack that drifted from the sync ones",
-    count: "12 merged in Haystack and its integrations",
+    count: "13 merged in Haystack and its integrations",
     what:
       "run_async implementations that ran blocking work on the event loop, held an asyncio.Lock across event loops, ignored max_workers, skipped batching or re-wrapped errors the sync path re-raises. These bugs hide from test suites that only call run(). Four of the twelve came from auditing every component's __init__ against to_dict, where a setting silently reverted when a saved pipeline was reloaded.",
     examples: [
@@ -188,13 +188,13 @@ const themes: Theme[] = [
   },
   {
     title: "The provider and tool-calling layer of LangChain.rb",
-    count: "30 merged, usually the same day",
+    count: "31 merged, usually the same day",
     what:
       "Fixes across its Anthropic, OpenAI, Gemini, Ollama, Cohere and Mistral adapters: tool_choice sent in the shape each API expects, an agent loop that could never stop calling a forced tool, streamed tool calls lost on Ollama, thinking blocks dropped from the tool-use loop, a migration to the Cohere v2 API, and tool errors handed back to the LLM instead of ending the run.",
     examples: [
       { label: "#1063", url: "https://github.com/patterns-ai-core/langchainrb/pull/1063" },
       { label: "#1058", url: "https://github.com/patterns-ai-core/langchainrb/pull/1058" },
-      { label: "all 30", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
+      { label: "all 31", url: "https://github.com/patterns-ai-core/langchainrb/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
     ],
   },
   {
@@ -210,13 +210,13 @@ const themes: Theme[] = [
   },
   {
     title: "Flows that break for real users of a Rails app",
-    count: "13 merged in Sure (personal finance, 10k★)",
+    count: "14 merged in Sure (personal finance, 10k★)",
     what:
       "Sure is a full Rails product, not a library, so the bugs are the ones users click into: provider setup from Add Account that bounced back to Settings or hid its own error, buttons that sent the wrong HTTP method, \"Create a bill\" from a transaction rendering Content Missing, and merging a pending duplicate that threw away its attachments, tags and notes.",
     examples: [
       { label: "sure #4278", url: "https://github.com/we-promise/sure/pull/4278" },
       { label: "sure #4247", url: "https://github.com/we-promise/sure/pull/4247" },
-      { label: "all 13", url: "https://github.com/we-promise/sure/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
+      { label: "all 14", url: "https://github.com/we-promise/sure/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
     ],
   },
   {
@@ -235,7 +235,7 @@ const themes: Theme[] = [
 const lessons = [
   {
     title: "Depth beats spread",
-    what: "Going back to a maintainer who already trusts the work pays more than a first PR somewhere new. LangChain.rb went from 6 merged to 30.",
+    what: "Going back to a maintainer who already trusts the work pays more than a first PR somewhere new. LangChain.rb went from 6 merged to 31, and LLM Tornado reached 69.",
   },
   {
     title: "Timing beats volume",
