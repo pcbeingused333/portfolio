@@ -14,6 +14,40 @@ type Project = {
 
 const projects: Project[] = [
   {
+    name: "tanda",
+    tagline: "A fleet of coding agents around one shared queue, with a review gate before anything ships.",
+    description:
+      "A small Python tool, with no dependencies, that runs roles of any agent CLI (Claude Code, opencode, Codex or your own command) around one SQLite queue. A scout fills the queue, builders take one item at a time, a reviewer sends work back or approves it, and the run ends by itself when every scout has finished and nothing is left to claim. Waiting is done by tanda, not by the agents: an agent only starts when there is an item for it, so idle roles cost no tokens. Each role may only set the verdicts it is allowed, an agent that exits without one leaves its item on HOLD for a human, and a local dashboard shows the queue and each item's history.",
+    highlight:
+      "It is the public, general version of the setup behind my open-source work below, which I run daily. Running it taught me more than building it did. The queue never starves for builders; it starves for good candidates. Auditing a receptive repo module by module, comparing each provider adapter with its siblings, finds far more real bugs than hunting for unclaimed issues, which popular repos close within hours. Most rejected work fails on checks nobody writes down: a renamed repo hiding your own earlier PR, a PR template that asks for something only a human can provide, a project whose purpose is one you should not put your name on. Those checks now run before any code is read, and anything that needs a person (a CLA, a sign-off, a design call) waits for one.",
+    stack: ["Python", "SQLite", "Claude Code", "Agent orchestration", "CLI", "HTML dashboard"],
+    github: "https://github.com/pcbeingused333/tanda",
+    role: "Design, implementation, daily operation",
+  },
+  {
+    name: "llm-drift-lint",
+    tagline: "A linter for LLM API calls that break when a provider changes or retires a model.",
+    description:
+      "Static checks for Python code that calls the Anthropic, OpenAI and Gemini SDKs. It finds the calls, resolves the model id when it is a literal or a constant, and checks each call against what that model accepts today: sampling parameters newer models reject, reading content[0].text when the first block is now a thinking block, a forced tool_choice under thinking, a default model past its shutdown date on OpenAI, the Claude API, the Gemini API or Vertex. An upcoming retirement is a warning and a passed one is an error, and every message links the page the date comes from.",
+    highlight:
+      "Every rule comes from a bug I fixed upstream, and the test corpus holds the real files from those fixes as they were just before and just after, with the findings a correct linter must report. False positives count as bugs: when a rule cannot tell which model a call uses, it stays silent. On sixteen large code bases (langchain, llama_index, crewAI, dspy, agno, semantic-kernel and others) the first six rules reported exactly two findings, and both were real bugs. The newer rules came out of the same loop: a pattern that keeps turning up in fixes becomes a rule, and the rule then finds the next repos to fix.",
+    stack: ["Python", "Static analysis", "AST", "CLI", "pytest", "GitHub Actions"],
+    github: "https://github.com/pcbeingused333/llm-drift-lint",
+    role: "Rules, model tables, test corpus",
+  },
+  {
+    name: "Weather-Aware Truck Routing",
+    tagline: "The safest truck route, judged by the forecast for the hour the truck reaches each point.",
+    description:
+      "A React + Django app built as a full-stack take-home. It asks Valhalla for three truck routes with the real gross weight, so roads with weight limits are respected, samples each route every 10, 25 or 50 miles, and gives every checkpoint an ETA from the router's own maneuver timings. Each checkpoint reads the hourly wind, rain and snow forecast for that ETA and gets a risk level from the brief's thresholds plus load rules: strong wind with a heavy load becomes Severe or No Travel. Routes are ranked by No Travel, Severe and High miles, then average risk, then travel time, and the map colours the chosen route by risk next to a 0–48 h forecast heatmap of the corridor.",
+    highlight:
+      "Most of the judgment went into edge cases the brief left open. Its ranges share endpoints, so a value on a boundary goes to the higher band, because this is a safety tool; a stretch between two checkpoints takes the worse of the two, since over-counting dangerous miles is safer than under-counting them. The free services pushed back too: Open-Meteo rate-limits the shared IP of a free Render instance, so on a 429 the backend asks the browser to fetch the forecast points itself and send them back, and the ranking still runs on the server. The rules are pure functions with table-driven tests.",
+    stack: ["React", "TypeScript", "MapLibre GL", "Django", "Python", "Valhalla", "Open-Meteo", "Render", "GitHub Actions", "pytest"],
+    github: "https://github.com/pcbeingused333/weather-truck-routing",
+    demo: "https://weather-truck-routing-p4iz.onrender.com",
+    role: "Design, full build, deployment",
+  },
+  {
     name: "Business Ops Agent",
     tagline: "An agent that can only act through a protocol, and a harness that scores how it acts.",
     description:
@@ -47,18 +81,6 @@ const projects: Project[] = [
     stack: ["Python", "Evals", "CLI", "pytest", "GitHub Actions"],
     github: "https://github.com/pcbeingused333/ragcite",
     role: "Library, CLI, evaluation design",
-  },
-  {
-    name: "Weather-Aware Truck Routing",
-    tagline: "The safest truck route, judged by the forecast for the hour the truck reaches each point.",
-    description:
-      "A React + Django app built as a full-stack take-home. It asks Valhalla for three truck routes with the real gross weight, so roads with weight limits are respected, samples each route every 10, 25 or 50 miles, and gives every checkpoint an ETA from the router's own maneuver timings. Each checkpoint reads the hourly wind, rain and snow forecast for that ETA and gets a risk level from the brief's thresholds plus load rules: strong wind with a heavy load becomes Severe or No Travel. Routes are ranked by No Travel, Severe and High miles, then average risk, then travel time, and the map colours the chosen route by risk next to a 0–48 h forecast heatmap of the corridor.",
-    highlight:
-      "Most of the judgment went into edge cases the brief left open. Its ranges share endpoints, so a value on a boundary goes to the higher band, because this is a safety tool; a stretch between two checkpoints takes the worse of the two, since over-counting dangerous miles is safer than under-counting them. The free services pushed back too: Open-Meteo rate-limits the shared IP of a free Render instance, so on a 429 the backend asks the browser to fetch the forecast points itself and send them back, and the ranking still runs on the server. The rules are pure functions with table-driven tests.",
-    stack: ["React", "TypeScript", "MapLibre GL", "Django", "Python", "Valhalla", "Open-Meteo", "Render", "GitHub Actions", "pytest"],
-    github: "https://github.com/pcbeingused333/weather-truck-routing",
-    demo: "https://weather-truck-routing-p4iz.onrender.com",
-    role: "Design, full build, deployment",
   },
   {
     name: "AI Website Chatbot Widget",
@@ -441,25 +463,27 @@ export default function Home() {
               other students.
             </p>
             <p>
-              I also built and shipped the website and an AI chat widget for{" "}
+              In 2025 I moved my business from Spain to Toronto on my own: leased premises in
+              Kensington Market, imported the machinery, got every permit, and ran{" "}
               <a href="https://www.churreriacalderon.com" target="_blank" rel="noreferrer" className="underline decoration-stone-300 underline-offset-4 hover:decoration-orange-700">
                 Churrer&iacute;a Calder&oacute;n
-              </a>
-              , my family&apos;s business in Toronto, from 2025 until it closed in 2026.
-              Running software for a business you also have to run teaches you which problems
-              are worth solving and which are not.
+              </a>{" "}
+              with no hires, from production and service to purchasing, cash and compliance,
+              until it closed in July 2026. Running a business alone teaches you which problems
+              are worth solving, and that something has to keep working while you are busy
+              with everything else.
             </p>
             <p>
-              Most of my recent work is <strong className="font-medium">RAG and agent systems in Python</strong>,
-              and increasingly the layer around them: evaluation, tracing, and the failure
-              handling that separates a demo from something you can leave running. I write
-              with AI tooling daily and treat its output the way I treat my own &mdash; measured,
+              Most of my recent work is the <strong className="font-medium">layer between applications and LLM providers</strong>:
+              streamed tool calls, token and cost accounting, and the code that breaks when a
+              provider changes or retires a model. I fix it upstream, where everyone gets the fix,
+              with a fleet of coding agents I built and run every day (tanda, above), and a reviewer
+              in front of everything it publishes. I treat AI output the way I treat my own: measured,
               not assumed.
             </p>
             <p>
               I work fully remote on <strong className="font-medium">UTC&minus;4</strong>, overlapping with
-              North American hours. Toronto now, Santo Domingo from October 2026. Spanish native,
-              professional English.
+              North American hours, from Santo Domingo. Spanish native, professional English.
             </p>
           </div>
         </div>
