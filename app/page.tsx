@@ -19,10 +19,10 @@ const projects: Project[] = [
     description:
       "A small Python tool, with no dependencies, that runs roles of any agent CLI (Claude Code, opencode, Codex or your own command) around one SQLite queue. A scout fills the queue, builders take one item at a time, a reviewer sends work back or approves it, and the run ends by itself when every scout has finished and nothing is left to claim. Waiting is done by tanda, not by the agents: an agent only starts when there is an item for it, so idle roles cost no tokens. Each role may only set the verdicts it is allowed, an agent that exits without one leaves its item on HOLD for a human, and a local dashboard shows the queue and each item's history.",
     highlight:
-      "It is the public, general version of the setup behind my open-source work below, which I run daily. Running it taught me more than building it did. The queue never starves for builders; it starves for good candidates. Auditing a receptive repo module by module, comparing each provider adapter with its siblings, finds far more real bugs than hunting for unclaimed issues, which popular repos close within hours. Most rejected work fails on checks nobody writes down: a renamed repo hiding your own earlier PR, a PR template that asks for something only a human can provide, a project whose purpose is one you should not put your name on. Those checks now run before any code is read, and anything that needs a person (a CLA, a sign-off, a design call) waits for one.",
+      "The open-source work below comes from the in-house version of this setup, a set of shell scripts I run every day; tanda is the clean, general rewrite of it, not yet the thing running in production. Running the in-house one taught me more than building it did. The queue never starves for builders; it starves for good candidates. Auditing a receptive repo module by module, comparing each provider adapter with its siblings, finds far more real bugs than hunting for unclaimed issues, which popular repos close within hours. Most rejected work fails on checks nobody writes down: a renamed repo hiding your own earlier PR, a PR template that asks for something only a human can provide, a project whose purpose is one you should not put your name on. Those checks now run before any code is read, and anything that needs a person (a CLA, a sign-off, a design call) waits for one.",
     stack: ["Python", "SQLite", "Claude Code", "Agent orchestration", "CLI", "HTML dashboard"],
     github: "https://github.com/pcbeingused333/tanda",
-    role: "Design, implementation, daily operation",
+    role: "Design and implementation",
   },
   {
     name: "llm-drift-lint",
@@ -477,7 +477,7 @@ export default function Home() {
               Most of my recent work is the <strong className="font-medium">layer between applications and LLM providers</strong>:
               streamed tool calls, token and cost accounting, and the code that breaks when a
               provider changes or retires a model. I fix it upstream, where everyone gets the fix,
-              with a fleet of coding agents I built and run every day (tanda, above), and a reviewer
+              with a fleet of coding agents I built and run every day (tanda, above, is its public rewrite), and a reviewer
               in front of everything it publishes. I treat AI output the way I treat my own: measured,
               not assumed.
             </p>
