@@ -111,10 +111,10 @@ type Theme = {
 };
 
 const ossStats = [
-  { value: "429", label: "merged pull requests" },
-  { value: "101", label: "projects" },
-  { value: "86%", label: "of decided PRs merged" },
-  { value: "16 h", label: "median time to merge" },
+  { value: "580", label: "merged pull requests" },
+  { value: "129", label: "projects" },
+  { value: "87%", label: "of decided PRs merged" },
+  { value: "15 h", label: "median time to merge" },
 ];
 
 type CaseStudy = {
@@ -143,7 +143,7 @@ const caseStudies: CaseStudy[] = [
     bug: "With Anthropic streaming and Microsoft.Extensions.AI, each parallel tool ran more than once and the follow-up request was rejected.",
     cause: "Every content_block_stop re-yielded all tool calls seen so far (1, then 1+2, then 1+2+3), and the tool-invocation middleware acted on each.",
     fix: "Yield the calls once, at the end of the stream, with the final usage.",
-    impact: "Merged the same day; 69 merged in the repo, including streamed input and cache token counts.",
+    impact: "Merged the same day; 85 merged in the repo, including streamed input and cache token counts.",
     links: [
       { label: "#205", url: "https://github.com/lofcz/LLMTornado/pull/205" },
       { label: "#214", url: "https://github.com/lofcz/LLMTornado/pull/214" },
