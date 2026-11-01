@@ -111,8 +111,8 @@ type Theme = {
 };
 
 const ossStats = [
-  { value: "580", label: "merged pull requests" },
-  { value: "129", label: "projects" },
+  { value: "634", label: "merged pull requests" },
+  { value: "144", label: "projects" },
   { value: "87%", label: "of decided PRs merged" },
   { value: "15 h", label: "median time to merge" },
 ];
@@ -143,7 +143,7 @@ const caseStudies: CaseStudy[] = [
     bug: "With Anthropic streaming and Microsoft.Extensions.AI, each parallel tool ran more than once and the follow-up request was rejected.",
     cause: "Every content_block_stop re-yielded all tool calls seen so far (1, then 1+2, then 1+2+3), and the tool-invocation middleware acted on each.",
     fix: "Yield the calls once, at the end of the stream, with the final usage.",
-    impact: "Merged the same day; 85 merged in the repo, including streamed input and cache token counts.",
+    impact: "Merged the same day; 87 merged in the repo, including streamed input and cache token counts.",
     links: [
       { label: "#205", url: "https://github.com/lofcz/LLMTornado/pull/205" },
       { label: "#214", url: "https://github.com/lofcz/LLMTornado/pull/214" },
@@ -232,13 +232,13 @@ const themes: Theme[] = [
   },
   {
     title: "Flows that break for real users of a Rails app",
-    count: "14 merged in Sure (personal finance, 10k★)",
+    count: "18 merged in Sure (personal finance, 10k★)",
     what:
       "Sure is a full Rails product, not a library, so the bugs are the ones users click into: provider setup from Add Account that bounced back to Settings or hid its own error, buttons that sent the wrong HTTP method, \"Create a bill\" from a transaction rendering Content Missing, and merging a pending duplicate that threw away its attachments, tags and notes.",
     examples: [
       { label: "sure #4278", url: "https://github.com/we-promise/sure/pull/4278" },
       { label: "sure #4247", url: "https://github.com/we-promise/sure/pull/4247" },
-      { label: "all 14", url: "https://github.com/we-promise/sure/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
+      { label: "all 18", url: "https://github.com/we-promise/sure/pulls?q=is%3Apr+author%3Apcbeingused333+is%3Amerged" },
     ],
   },
   {
@@ -257,7 +257,7 @@ const themes: Theme[] = [
 const lessons = [
   {
     title: "Depth beats spread",
-    what: "Going back to a maintainer who already trusts the work pays more than a first PR somewhere new. LangChain.rb went from 6 merged to 31, and LLM Tornado reached 69.",
+    what: "Going back to a maintainer who already trusts the work pays more than a first PR somewhere new. LangChain.rb went from 6 merged to 31, and LLM Tornado reached 87.",
   },
   {
     title: "Timing beats volume",
